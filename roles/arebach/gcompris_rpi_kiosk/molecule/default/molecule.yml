@@ -1,0 +1,44 @@
+# GCompris RPi Kiosk — Molecule Test Configuration
+# ==================================================
+# Tests the role inside a privileged Docker container running Debian 12
+# (Bookworm) to simulate the target Raspberry Pi OS environment.
+
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: galaxy.yml
+    requirements-file: requirements.yml
+    ignore-errors: true
+
+driver:
+  name: docker
+  options:
+    privileged: true
+
+platforms:
+  - name: rpi-os-bookworm-test
+    image: pycontribs/debian:12
+    privileged: true
+    command: "/lib/systemd/systemd"
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    cgroupns: host
+    tmpfs:
+      - "/run"
+      - "/run/lock"
+    capabilities:
+      - "SYS_ADMIN"
+
+provisioner:
+  name: ansible
+  inventory:
+    links:
+      group_vars: group_vars
+  playbooks:
+    verify: ../default/verify.yml
+
+verifier:
+  name: ansible
+  options:
+    verbose: true

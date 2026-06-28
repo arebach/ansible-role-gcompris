@@ -1,0 +1,27 @@
+# GCompris RPi Kiosk — Deployment Variables (Example)
+# ======================================================
+# Override defaults for your deployment.
+# Reference: roles/arebach/gcompris_rpi_kiosk/defaults/main.yml
+#
+# To use: ansible-playbook -i inventory.yml playbooks/provision.yml \
+#         -e @vars/deployment.yml
+
+# Network access: "full", "internal", or "none"
+# Recommended: "internal" for classrooms (LAN games work, no internet)
+gcompris_network_mode: "internal"
+
+# Kiosk mode: yes or no
+# Recommended: yes for dedicated devices
+gcompris_kiosk_mode: yes
+
+# Age filtering: restrict activities for younger children
+# 0 = all ages (2-12), 9 = only advanced activities
+# Example: min=0 max=5 for ages 2-7
+gcompris_min_age_level: 0
+gcompris_max_age_level: 5
+
+# Kiosk user (change if needed)
+gcompris_kiosk_user: "kiosk"
+
+# Touchscreen support (set true for official RPi touch display)
+gcompris_enable_touchscreen: false

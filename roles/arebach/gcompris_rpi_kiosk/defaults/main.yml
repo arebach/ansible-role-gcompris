@@ -1,0 +1,85 @@
+# GCompris RPi Kiosk Role — Default Variables
+# =============================================
+# These variables have the lowest precedence and can be overridden
+# during deployment via inventory or command-line variables.
+#
+# ── GCompris Version ──────────────────────────────────────────────
+# Default: latest from Debian repos
+gcompris_version: ""
+
+# ── Kiosk Mode ────────────────────────────────────────────────────
+# When enabled, the system runs as a single-purpose kiosk with:
+#   - Fullscreen, no tray, no exit menu
+#   - VT switching disabled (Ctrl+Alt+Fn)
+#   - X server termination blocked (Ctrl+Alt+Backspace)
+#   - Getty terminals masked (no TTY shell access)
+#   - logind configured to disable virtual terminals
+#   - All user desktops replaced by GCompris
+#
+# Set to false to run GCompris as a normal application.
+gcompris_kiosk_mode: yes
+
+# ── Network Restriction Mode ──────────────────────────────────────
+# Controls network access at the OS level after provisioning:
+#
+#   "full"      — All network services remain active (default)
+#                 Internet access for A/V downloads, cloud saves, etc.
+#   "internal"  — Network stack active but internet blocked
+#                 Firewall rules allow only private ranges (10.0.0.0/8,
+#                 172.16.0.0/12, 192.168.0.0/16) on common ports.
+#                 Internal LAN features work; cloud/A/V downloads blocked.
+#   "none"      — Air-gapped. All network services stopped and disabled.
+#                 No network access whatsoever.
+#
+gcompris_network_mode: "internal"
+
+# ── Kiosk User ─────────────────────────────────────────────────────
+# Dedicated system user for the kiosk session
+gcompris_kiosk_user: "kiosk"
+gcompris_kiosk_group: "kiosk"
+
+# ── Local Package Staging ──────────────────────────────────────────
+# Directory where offline packages are staged on the target
+gcompris_local_pkg_dir: "/var/cache/gcompris_pkg"
+
+# ── Display Server ─────────────────────────────────────────────────
+# Force X11 mode (required — Raspberry Pi OS Bookworm defaults to Wayland)
+gcompris_force_x11: true
+
+# ── LightDM Autologin ──────────────────────────────────────────────
+# Timeout before auto-login (0 = immediate)
+gcompris_autologin_timeout: 0
+
+# ── Age Restriction ────────────────────────────────────────────────
+# Minimum age level (0-9) for activity filtering inside GCompris.
+# Higher values restrict the child to activities suitable for that age+.
+# GCompris levels: 0 (2 yr) through 9 (12+ yr).
+gcompris_min_age_level: 0
+
+# ── Disable Activities Beyond Level ────────────────────────────────
+# Maximum age level (0-9) for activity filtering.
+# Set below 10 to lock out advanced activities.
+# Default 9 = all activities unlocked.
+gcompris_max_age_level: 9
+
+# ── Fullscreen Startup ─────────────────────────────────────────────
+# Automatically launch GCompris in fullscreen mode
+gcompris_fullscreen: true
+
+# ── Exit Key Blocking ──────────────────────────────────────────────
+# Block common kiosk-exit key combinations
+gcompris_block_exit_keys: true
+
+# ── Screen Timeout / Saver ────────────────────────────────────────
+# Disable screen blanking and screen saver to keep display always on
+gcompris_disable_screensaver: true
+
+# ── Touchscreen Calibration ────────────────────────────────────────
+# Enable tslib for capacitive touchscreens (e.g., official RPi touch
+# display or third-party HDMI touch panels)
+gcompris_enable_touchscreen: false
+
+# ── HDMI Output Force ──────────────────────────────────────────────
+# Force HDMI output even if no display is detected (useful for
+# first-time headless setup or stubborn displays)
+gcompris_force_hdmi: false

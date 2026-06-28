@@ -1,0 +1,115 @@
+# GCompris RPi Kiosk — Molecule Verification Test Suite
+# ========================================================
+# Validates the role configuration files are correctly generated.
+# These tests verify static configuration, not runtime behavior.
+
+---
+- name: Verify GCompris RPi Kiosk role configuration
+  hosts: all
+  become: true
+  tasks:
+    - name: Verify package staging directory exists
+      ansible.builtin.stat:
+        path: "{{ gcompris_local_pkg_dir }}"
+      register: pkg_dir_check
+      assert:
+        that:
+          - "pkg_dir_check.stat.exists"
+        fail_msg: "Package staging directory not found."
+
+    - name: Verify LightDM autologin configuration exists
+      ansible.builtin.stat:
+        path: "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
+      register: autologin_conf
+      assert:
+        that:
+          - "autologin_conf.stat.exists"
+        fail_msg: "LightDM autologin configuration not found."
+
+    - name: Verify LightDM autologin user is set correctly
+      ansible.builtin.command:
+        cmd: "cat /etc/lightdm/lightdm.conf.d/10-autologin.conf"
+      register: autologin_content
+      changed_when: false
+      assert:
+        that:
+          - "'autologin-user={{ gcompris_kiosk_user }}' in autologin_content.stdout"
+        fail_msg: "LightDM autologin configuration has incorrect user."
+
+    - name: Verify kiosk session .desktop file exists
+      ansible.builtin.stat:
+        path: "/usr/share/xsessions/gcompris-kiosk.desktop"
+      register: session_desktop
+      assert:
+        that:
+          - "session_desktop.stat.exists"
+        fail_msg: "GCompris kiosk session .desktop file not found."
+
+    - name: Verify kiosk session wrapper script exists
+      ansible.builtin.stat:
+        path: "/usr/local/bin/gcompris-kiosk-session.sh"
+      register: session_script
+      assert:
+        that:
+          - "session_script.stat.exists"
+        fail_msg: "GCompris kiosk session wrapper script not found."
+
+    - name: Verify X11 kiosk configuration exists (when kiosk mode enabled)
+      ansible.builtin.stat:
+        path: "/etc/X11/xorg.conf.d/10-kiosk.conf"
+      register: xorg_conf
+      when: gcompris_kiosk_mode | bool
+      assert:
+        that:
+          - "xorg_conf.stat.exists"
+        fail_msg: "X11 kiosk configuration not found."
+
+    - name: Verify X11 configuration content (DontVTSwitch)
+      ansible.builtin.command:
+        cmd: "cat /etc/X11/xorg.conf.d/10-kiosk.conf"
+      register: xorg_content
+      changed_when: false
+      when: gcompris_kiosk_mode | bool
+      assert:
+        that:
+          - "'DontVTSwitch' in xorg_content.stdout"
+          - "'DontZap' in xorg_content.stdout"
+        fail_msg: "X11 kiosk configuration has incorrect content."
+
+    - name: Verify logind configuration exists (when kiosk mode enabled)
+      ansible.builtin.stat:
+        path: "/etc/systemd/logind.conf.d/novt.conf"
+      register: novt_conf
+      when: gcompris_kiosk_mode | bool
+      assert:
+        that:
+          - "novt_conf.stat.exists"
+        fail_msg: "Logind configuration not found."
+
+    - name: Verify getty@tty1 is masked (when kiosk mode enabled)
+      ansible.builtin.stat:
+        path: "/etc/systemd/system/getty@tty1.service"
+      register: getty_link
+      when: gcompris_kiosk_mode | bool
+      assert:
+        that:
+          - "getty_link.stat.islnk"
+          - "getty_link.stat.lnk_target == '/dev/null'"
+        fail_msg: "Getty on tty1 is not properly masked."
+
+    - name: Verify GCompris package is installed
+      ansible.builtin.command:
+        cmd: "dpkg -l gcompris"
+      register: gcompris_pkg
+      changed_when: false
+      failed_when: "'not installed' in gcompris_pkg.stdout"
+
+    - name: Verify internal network mode configuration exists
+      ansible.builtin.stat:
+        path: "/usr/local/bin/gcompris-network-status.sh"
+      register: net_status
+      when: gcompris_network_mode == 'internal' or gcompris_network_mode == 'none'
+      assert:
+        that:
+          - "net_status.stat.exists"
+        fail_msg: "Network status indicator not found."

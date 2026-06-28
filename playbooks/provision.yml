@@ -1,0 +1,30 @@
+# GCompris RPi Kiosk — Playbook
+# ================================
+# Example playbook to provision a Raspberry Pi with GCompris kiosk.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml playbooks/provision.yml
+#
+# To customize, pass extra variables:
+#   ansible-playbook -i inventory.yml playbooks/provision.yml \
+#     -e gcompris_network_mode=none \
+#     -e gcompris_min_age_level=3 \
+#     -e gcompris_max_age_level=6
+#
+# Network modes:
+#   "full"      — All network access (default: internal)
+#   "internal"  — LAN only, internet blocked (recommended default)
+#   "none"      — Air-gapped, no network at all
+#
+# Kiosk mode:
+#   yes (default) — Full lockdown, auto-start GCompris
+#   no            — Normal desktop, GCompris as regular app
+
+---
+- name: Provision Raspberry Pi with GCompris Kiosk
+  hosts: all
+  become: true
+  vars_files:
+    - "../vars/deployment.yml"
+  roles:
+    - arebach.gcompris_rpi_kiosk

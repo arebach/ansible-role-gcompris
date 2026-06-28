@@ -1,0 +1,82 @@
+# GCompris Kiosk — Network: None (Air-Gapped) Mode
+# ===================================================
+# gcompris_network_mode: none
+#
+# Complete air-gap: all network services stopped and disabled.
+# This is the maximum security posture — suitable for devices
+# in classrooms or public areas where any network access would
+# violate policy.
+#
+# Services disabled:
+#   - WPA Supplicant (Wi-Fi)
+#   - NetworkManager (Wi-Fi/Ethernet management)
+#   - dhcpcd (DHCP client)
+#   - Bluetooth (radio)
+#   - ModemManager (cellular)
+#
+# Result: The device cannot reach any network — not LAN, not internet.
+
+---
+- name: Stop and disable Wi-Fi service (WPA Supplicant)
+  ansible.builtin.systemd:
+    name: "wpa_supplicant.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Stop and disable NetworkManager
+  ansible.builtin.systemd:
+    name: "NetworkManager.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Stop and disable DHCP client
+  ansible.builtin.systemd:
+    name: "dhcpcd.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Stop and disable Bluetooth
+  ansible.builtin.systemd:
+    name: "bluetooth.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Stop and disable ModemManager (cellular)
+  ansible.builtin.systemd:
+    name: "ModemManager.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Disable USB networking (prevent Ethernet via USB adapter)
+  ansible.builtin.lineinfile:
+    path: "/etc/modprobe.d/gcompris-no-usb-net.conf"
+    line: "install usbnet /bin/true"
+    create: true
+    mode: "0644"
+  ignore_errors: true
+
+- name: Mask NetworkManager and wpa_supplicant
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop:
+    - "NetworkManager.service"
+    - "wpa_supplicant.service"
+  ignore_errors: true
+
+- name: Deploy air-gapped indicator
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      # Display air-gapped status
+      echo "Air-gapped — no network access"
+    dest: "/usr/local/bin/gcompris-network-status.sh"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  ignore_errors: true

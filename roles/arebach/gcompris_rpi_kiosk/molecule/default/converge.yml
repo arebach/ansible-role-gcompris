@@ -1,0 +1,12 @@
+# GCompris RPi Kiosk — Molecule Default Converge Playbook
+# =========================================================
+# Applies the arebach.gcompris_rpi_kiosk role to the test container.
+
+---
+- name: Converge GCompris RPi Kiosk role
+  hosts: all
+  become: true
+  vars:
+    gcompris_network_mode: "internal"
+  roles:
+    - arebach.gcompris_rpi_kiosk

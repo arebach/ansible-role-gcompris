@@ -1,0 +1,20 @@
+# GCompris RPi Kiosk — LightDM Autologin Configuration
+# =======================================================
+# Deployed to: /etc/lightdm/lightdm.conf.d/10-autologin.conf
+#
+# This configuration enables automatic login for the kiosk user
+# immediately upon boot, launching GCompris in fullscreen kiosk mode.
+#
+# ── How Kiosk Session Works ──────────────────────────────────────
+# We use a custom .desktop file (/usr/share/xsessions/gcompris-kiosk.desktop)
+# that launches GCompris with kiosk flags (--fullscreen --no-tray --hide-ui).
+# LightDM autologs in and starts this session directly, no greeter shown.
+#
+[Seat:*]
+autologin-user={{ gcompris_kiosk_user }}
+autologin-user-timeout={{ gcompris_autologin_timeout }}
+user-session=gcompris-kiosk
+autologin-session=gcompris-kiosk
+greeter-hide-users=true
+greeter-show-manual-login=false
+allow-guest=false

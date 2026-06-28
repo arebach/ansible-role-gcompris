@@ -1,0 +1,233 @@
+# GCompris RPi Kiosk Role — Tasks
+# ================================
+# Declarative, idempotent provisioning tasks for the GCompris kiosk
+# on Raspberry Pi.
+#
+# Kiosk mode (gcompris_kiosk_mode: yes) enables security lockdown:
+#   - X11 server flags block VT switching and server termination
+#   - Getty service on tty1 is masked
+#   - logind configured to disable virtual terminals
+#   - Default desktop sessions replaced by GCompris kiosk
+#
+# Network modes (gcompris_network_mode):
+#   "full"   — No restrictions (default: internal, not full)
+#   "internal" — Firewall allows only private RFC1918 ranges
+#   "none"     — Air-gapped; all network services stopped/disabled
+#
+# Age restriction (gcompris_min_age_level / gcompris_max_age_level):
+#   Filters GCompris activities by developmental level (0-9).
+#   Lower numbers = activities for younger children.
+
+---
+# ── Task 1: Create Required Directories ──────────────────────────
+- name: Ensure target directories exist on the host
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  loop:
+    - "{{ gcompris_local_pkg_dir }}"
+    - "/etc/X11/xorg.conf.d"
+    - "/etc/lightdm/lightdm.conf.d"
+    - "/etc/systemd/logind.conf.d"
+    - "/usr/share/xsessions"
+    - "/usr/local/bin"
+    - "/etc/ufw/applications.d"
+
+# ── Task 2: Force X11 Display Compositor ─────────────────────────
+- name: Force Raspberry Pi OS display compositor to X11 mode
+  ansible.builtin.command:
+    cmd: "raspi-config nonint do_wayland x11"
+  register: x11_switch_result
+  changed_when: x11_switch_result.rc == 0
+  when: gcompris_force_x11 | bool
+  notify: Restart LightDM Service
+
+# ── Task 3: Force HDMI Output (Optional) ─────────────────────────
+- name: Force HDMI output even if no display detected
+  ansible.builtin.command:
+    cmd: "tvservice -e \"Group=DMT, Mode=82\""
+  when: gcompris_force_hdmi | bool
+  ignore_errors: true
+
+# ── Task 4: Create Kiosk System Group ────────────────────────────
+- name: Create dedicated system group for the kiosk user
+  ansible.builtin.group:
+    name: "{{ gcompris_kiosk_group }}"
+    state: "present"
+
+# ── Task 5: Create Kiosk User Account ────────────────────────────
+- name: Create local user account for the kiosk session
+  ansible.builtin.user:
+    name: "{{ gcompris_kiosk_user }}"
+    group: "{{ gcompris_kiosk_group }}"
+    shell: "/bin/bash"
+    create_home: true
+    state: "present"
+
+# ── Task 6: Install GCompris Package ─────────────────────────────
+- name: Install GCompris from Debian repository
+  ansible.builtin.apt:
+    name: "{{ gcompris_version | default('gcompris', true) if gcompris_version | length > 0 else 'gcompris' }}"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 3600
+  register: gcompris_install
+  retries: 3
+  delay: 10
+  ignore_errors: true
+
+# ── Task 7: Install Additional Kiosk Packages ────────────────────
+- name: Install supporting kiosk packages
+  ansible.builtin.apt:
+    name: "{{ gcompris_packages }}"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 3600
+  when: gcompris_install is not failed
+
+# ── Task 8: Deploy GCompris Kiosk Session Wrapper Script ─────────
+- name: Deploy the GCompris kiosk session wrapper script
+  ansible.builtin.template:
+    src: "gcompris-kiosk-session.j2"
+    dest: "/usr/local/bin/gcompris-kiosk-session.sh"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+# ── Task 9: Deploy GCompris Kiosk .desktop Entry ─────────────────
+- name: Deploy GCompris kiosk session definition
+  ansible.builtin.template:
+    src: "gcompris-kiosk.desktop.j2"
+    dest: "/usr/share/xsessions/gcompris-kiosk.desktop"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: Restart LightDM Service
+
+# ── Task 10: Deploy LightDM Autologin Configuration ──────────────
+- name: Generate the autologin configuration for LightDM
+  ansible.builtin.template:
+    src: "10-autologin.conf.j2"
+    dest: "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: Restart LightDM Service
+
+# ── Task 11: Clear LightDM Session Cache (Kiosk Mode Only) ───────
+- name: Remove cached session configuration to prevent override
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/home/{{ gcompris_kiosk_user }}/.dmrc"
+  when: gcompris_kiosk_mode | bool
+  ignore_errors: true
+
+# ── Task 12: Remove Default Desktop Sessions (Kiosk Mode Only) ──
+- name: Remove default desktop session files to prevent selection
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/usr/share/xsessions/pixart.desktop"
+    - "/usr/share/xsessions/rpidebian.desktop"
+    - "/usr/share/xsessions/debian.desktop"
+  when: gcompris_kiosk_mode | bool
+  ignore_errors: true
+
+# ── Task 13: Deploy X11 Security Server Flags (Kiosk Mode Only) ──
+- name: Apply X11 security flags to block console escape keys
+  ansible.builtin.copy:
+    src: "10-kiosk.conf"
+    dest: "/etc/X11/xorg.conf.d/10-kiosk.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when: gcompris_kiosk_mode | bool
+
+# ── Task 14: Deploy logind Modifications (Kiosk Mode Only) ───────
+- name: Deploy logind configuration to disable virtual terminals
+  ansible.builtin.copy:
+    content: |
+      [Login]
+      NAutoVTs=0
+      ReserveVT=0
+    dest: "/etc/systemd/logind.conf.d/novt.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when: gcompris_kiosk_mode | bool
+  notify: Restart systemd-logind
+
+# ── Task 15: Mask Getty Service on TTY1 (Kiosk Mode Only) ────────
+- name: Mask default getty on tty1 to prevent terminal shell access
+  ansible.builtin.systemd:
+    name: "getty@tty1.service"
+    state: "stopped"
+    enabled: false
+    masked: true
+  when: gcompris_kiosk_mode | bool
+
+# ── Task 16: Disable Screen Blank & Screensaver (Kiosk Mode Only) -
+- name: Disable screen blanking and screensaver
+  ansible.builtin.copy:
+    content: |
+      [X11]
+      DPMSEnabled=false
+
+      [Screensaver]
+      IdleDelay=0
+      ScreenSaverEnabled=false
+    dest: "/etc/lightdm/lightdm.conf.d/99-noscreensaver.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when: gcompris_kiosk_mode | bool
+  notify:
+    - Restart LightDM Service
+    - Apply DPMS settings
+
+# ── Task 17: Configure HDMI / Display Settings (Kiosk Mode Only) ─
+- name: Force display always-on via boot config
+  ansible.builtin.lineinfile:
+    path: "/boot/firmware/config.txt"
+    regexp: "^#?{{ item.regexp }}"
+    line: "{{ item.line }}"
+    create: true
+    mode: "0644"
+  loop:
+    - regexp: "^hdmi_force_hotplug"
+      line: "hdmi_force_hotplug=1"
+    - regexp: "^hdmi_blanking"
+      line: "hdmi_blanking=1"
+  when: gcompris_kiosk_mode | bool
+
+# ── Task 18: Configure Touchscreen (If Enabled) ──────────────────
+- name: Deploy tslib calibration profile
+  ansible.builtin.copy:
+    content: |
+      export TSLIB_TSDEVICE=/dev/input/event0
+      export TSLIB_CALIBFILE=/etc/pointercal
+      export TSLIB_CONFFILE=/etc/ts.conf
+      export TSLIB_PLUGINDIR=/usr/lib/arm-linux-gnueabihf/ts
+      export TSLIB_CONSOLEDEVICE=none
+      export TSLIB_FBDEVICE=/dev/fb0
+      export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0
+    dest: "/etc/profile.d/tslib.sh"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when: gcompris_enable_touchscreen | bool
+  notify: Restart udev
+
+# ── Task 19: Configure Network Restrictions ──────────────────────
+# This task applies different network policies based on the
+# gcompris_network_mode variable.
+
+- name: Apply network restriction rules based on mode
+  ansible.builtin.include_tasks: "tasks/network-{{ gcompris_network_mode }}.yml"
+  when: gcompris_network_mode in ["full", "internal", "none"]

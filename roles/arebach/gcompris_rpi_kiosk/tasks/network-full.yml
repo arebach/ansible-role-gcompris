@@ -1,0 +1,15 @@
+# GCompris Kiosk — Network: Full Access Mode
+# =============================================
+# gcompris_network_mode: full
+#
+# All network services remain active and enabled.
+# This is the least restrictive mode — allows internet
+# for A/V downloads, cloud saves, and updates.
+#
+# No firewall rules are applied.
+
+---
+# Nothing to do in "full" mode — all services stay as-is.
+- name: Network mode is "full" — no restrictions applied
+  ansible.builtin.debug:
+    msg: "Network restriction mode is 'full' — all services remain active."

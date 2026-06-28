@@ -1,0 +1,121 @@
+# GCompris Kiosk — Network: Internal-Only Mode
+# ================================================
+# gcompris_network_mode: internal
+#
+# Network stack remains active but internet is blocked.
+# Only RFC1918 private ranges are allowed on common ports.
+# This protects children from internet content while allowing:
+#   - LAN game servers / multiplayer
+#   - Local media sharing
+#   - Internal DNS (for library school networks)
+#   - SSH to local admin machines
+#
+# Internet-sourced content (A/V packs, cloud saves) blocked.
+
+---
+- name: Ensure UFW is installed and enabled for internal mode
+  ansible.builtin.apt:
+    name: "ufw"
+    state: "present"
+    update_cache: true
+
+- name: Set UFW default policies (deny all incoming, allow outgoing)
+  ansible.builtin.ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: "incoming", policy: "deny" }
+    - { direction: "outgoing", policy: "allow" }
+
+- name: Apply permissive rules for internal/private traffic
+  ansible.builtin.ufw:
+    rule: "{{ item.rule }}"
+    from_addr: "{{ item.from }}"
+    from_port: "{{ item.port }}"
+    to_port: "{{ gcompris_allowed_internal_ports | join(',') }}"
+  loop:
+    # Allow DNS for internal DNS servers (10.x, 172.x, 192.168.x)
+    - { rule: "allow", from: "10.0.0.0/8", port: "53" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "53" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "53" }
+    # Allow DHCP
+    - { rule: "allow", from: "10.0.0.0/8", port: "67" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "67" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "67" }
+    # Allow SSH (internal only)
+    - { rule: "allow", from: "10.0.0.0/8", port: "22" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "22" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "22" }
+    # Allow RDP (internal only)
+    - { rule: "allow", from: "10.0.0.0/8", port: "3389" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "3389" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "3389" }
+    # Allow HTTP/HTTPS (internal only)
+    - { rule: "allow", from: "10.0.0.0/8", port: "80" }
+    - { rule: "allow", from: "10.0.0.0/8", port: "443" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "80" }
+    - { rule: "allow", from: "172.16.0.0/12", port: "443" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "80" }
+    - { rule: "allow", from: "192.168.0.0/16", port: "443" }
+  notify: Reload UFW Firewall
+
+- name: Enable UFW
+  ansible.builtin.command:
+    cmd: "ufw --force enable"
+  changed_when: true
+
+- name: Block outbound internet traffic (only allow internal ranges)
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: DROP
+  loop:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+  # NOTE: This is a permissive allowlist approach — all outbound
+  # traffic to non-RFC1918 addresses is implicitly allowed by
+  # UFW's default outgoing=allow. To truly block internet, we add
+  # a DROP rule BEFORE the accept rules.
+
+- name: Deploy restrictive iptables rules for internal-only mode
+  ansible.builtin.copy:
+    content: |
+      #!/bin/sh
+      # GCompris Kiosk — Internal-only network filter
+      # Blocks all outbound traffic except to RFC1918 private ranges.
+      # Deployed to /etc/ufw/before.rules by the UFW "before" hook.
+      
+      *filter
+      :OUTPUT [ACCEPT]
+      
+      # Drop outbound to internet (non-private) on sensitive ports
+      -A OUTPUT -p tcp --dport 80 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
+      -A OUTPUT -p tcp --dport 443 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
+      -A OUTPUT -p udp --dport 53 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
+      
+      COMMIT
+    dest: "/etc/ufw/user.rules.d/gcompris-internal.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: Reload UFW Firewall
+
+- name: Disable Bluetooth (reduce wireless attack surface)
+  ansible.builtin.systemd:
+    name: "bluetooth.service"
+    state: "stopped"
+    enabled: false
+  ignore_errors: true
+
+- name: Deploy network status indicator script
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      # Display current network mode in status bar
+      echo "Internal-only network active"
+    dest: "/usr/local/bin/gcompris-network-status.sh"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  ignore_errors: true

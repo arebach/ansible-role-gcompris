@@ -1,0 +1,38 @@
+# GCompris RPi Kiosk Role — Handlers
+# =====================================
+# Service restart handlers triggered by configuration changes.
+#
+# ── Display Manager ───────────────────────────────────────────────
+# Restarts LightDM to pick up autologin and session changes.
+- name: Restart LightDM Service
+  ansible.builtin.systemd:
+    name: "lightdm"
+    state: "restarted"
+
+# ── Input System ──────────────────────────────────────────────────
+# Restarts udev to pick up tslib / touchscreen calibrations.
+- name: Restart udev
+  ansible.builtin.systemd:
+    name: "udev"
+    state: "restarted"
+
+# ── Display Server ────────────────────────────────────────────────
+# Restarts systemd-logind to pick up VT disable changes.
+- name: Restart systemd-logind
+  ansible.builtin.systemd:
+    name: "systemd-logind"
+    state: "restarted"
+
+# ── Firewall ──────────────────────────────────────────────────────
+# Reloads iptables / UFW when network restriction rules change.
+- name: Reload UFW Firewall
+  ansible.builtin.systemd:
+    name: "ufw"
+    state: "restarted"
+
+# ── Screen Blanking ───────────────────────────────────────────────
+# Applies DPMS / screen blanking settings immediately.
+- name: Apply DPMS settings
+  ansible.builtin.command:
+    cmd: "xset s off; xset -dpms; xset s noblank"
+  changed_when: true

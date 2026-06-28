@@ -1,0 +1,26 @@
+# Galaxy Metadata for Ansible Galaxy Publishing
+# ==============================================
+
+namespace: arebach
+name: gcompris_rpi_kiosk
+version: 1.0.0
+readme: README.md
+authors:
+  - Ari Rebach <ari@arebach.com>
+description: Ansible Galaxy role for deploying a child-safe GCompris kiosk on Raspberry Pi
+license:
+  - MIT
+tags:
+  - gcompris
+  - raspberry-pi
+  - kiosk
+  - children
+  - educational
+  - air-gapped
+  - bookworm
+  - x11
+  - lightdm
+  - touchscreen
+  - age-restricted
+homepage: https://github.com/arebach/ansible-role-gcompris
+issues: https://github.com/arebach/ansible-role-gcompris/issues

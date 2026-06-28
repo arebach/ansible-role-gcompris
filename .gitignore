@@ -1,0 +1,34 @@
+# GCompris RPi Kiosk Role — .gitignore
+# =======================================
+# Ignore patterns for the Ansible Galaxy role repository.
+
+---
+# ── Ansible/Molecule ─────────────────────────────────────────────
+molecule/default/__pycache__/
+molecule/default/.molecule/
+molecule/default/certs/
+molecule/default/*.pid
+molecule/default/logs/
+molecule/default/playbook.out
+roles/gcompris_rpi_kiosk/molecule/
+
+# ── IDE ───────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Secrets ──────────────────────────────────────────────────────
+*.key
+*.pem
+.env
+!*.env.example

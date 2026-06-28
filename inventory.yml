@@ -1,0 +1,25 @@
+# GCompris RPi Kiosk — Inventory
+# =================================
+# Define target Raspberry Pi hosts here.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml playbooks/provision.yml
+#
+# To customize variables:
+#   ansible-playbook -i inventory.yml playbooks/provision.yml \
+#     -e gcompris_network_mode=none \
+#     -e gcompris_min_age_level=2
+
+---
+all:
+  children:
+    gcompris_kiosks:
+      hosts:
+        kiosk-pi:
+          ansible_host: 192.168.1.100
+          ansible_user: pi
+          ansible_become_pass: your_password
+          gcompris_network_mode: internal
+          gcompris_kiosk_mode: yes
+          gcompris_min_age_level: 0
+          gcompris_max_age_level: 5

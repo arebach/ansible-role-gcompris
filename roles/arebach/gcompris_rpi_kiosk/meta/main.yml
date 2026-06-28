@@ -1,0 +1,31 @@
+# GCompris RPi Kiosk Role — Galaxy Metadata
+# ===========================================
+# Ansible Galaxy role metadata for discovery and dependency management.
+
+---
+galaxy_info:
+  namespace: arebach
+  role_name: gcompris_rpi_kiosk
+  author: Ari Rebach
+  description: Ansible Galaxy role for deploying a child-safe GCompris kiosk on Raspberry Pi
+  company: "Arebach Consulting"
+  license: MIT
+  min_ansible_version: "2.14"
+
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+
+  galaxy_tags:
+    - gcompris
+    - raspberry-pi
+    - kiosk
+    - children
+    - educational
+    - air-gapped
+    - bookworm
+    - x11
+    - lightdm
+    - touchscreen
+    - age-restricted
