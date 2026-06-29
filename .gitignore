@@ -32,3 +32,11 @@ logs/
 *.pem
 .env
 !*.env.example
+
+# ── Local inventory overrides ────────────────────────────────────
+# Real deployment targets go here — never commit this file.
+# Use as: ansible-playbook -i inventory.local.yml playbooks/provision.yml
+inventory.local.yml
+inventory.test.yml
+inventory.staging.yml
+inventory.prod.yml
