@@ -38,6 +38,9 @@ gcompris_rpi_kiosk_network_mode: "internal"
 # Dedicated system user for the kiosk session
 gcompris_rpi_kiosk_user: "kiosk"
 gcompris_rpi_kiosk_group: "kiosk"
+# Password for the kiosk user (used for manual login if autologin fails)
+# Default: "kiosk" — change this for production deployments
+gcompris_rpi_kiosk_password: "kiosk"
 
 # ── Local Package Staging ──────────────────────────────────────────
 # Directory where offline packages are staged on the target

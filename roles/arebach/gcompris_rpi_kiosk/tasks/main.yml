@@ -99,6 +99,7 @@
     append: true
     shell: "/bin/bash"
     create_home: true
+    password: "{{ gcompris_rpi_kiosk_password | password_hash('sha512') }}"
     state: "present"
 
 # ── Task 6: Install GCompris Package ─────────────────────────────
