@@ -1,0 +1,31 @@
+# GCompris RPi Kiosk — Screen Timeout Configuration
+# ====================================================
+# Deployed to: /etc/lightdm/lightdm.conf.d/99-screen-timeout.conf
+#
+# Controls DPMS (Display Power Management Signaling) and X11
+# screensaver timeout. Configured via gcompris_screen_timeout_minutes.
+#
+# When timeout is 0: screen blanking fully disabled (always on)
+# When timeout > 0: screen blanks after N minutes of inactivity
+
+{% if gcompris_screen_timeout_minutes | int == 0 %}
+# Screen blanking disabled — display always on
+[X11]
+DPMSEnabled=false
+
+[Screensaver]
+IdleDelay=0
+ScreenSaverEnabled=false
+{% else %}
+# Screen blanks after {{ gcompris_screen_timeout_minutes }} minutes of inactivity
+[X11]
+DPMSEnabled=true
+DPMSSuspendTime={{ gcompris_screen_timeout_minutes }}
+DPMSStandbyTime={{ gcompris_screen_timeout_minutes }}
+DPMSCycle={{ gcompris_screen_timeout_minutes }}
+
+[Screensaver]
+IdleDelay={{ gcompris_screen_timeout_minutes }}
+ScreenSaverEnabled=true
+Cycle={{ gcompris_screen_timeout_minutes }}
+{% endif %}

@@ -172,17 +172,11 @@
     masked: true
   when: gcompris_kiosk_mode | bool
 
-# ── Task 16: Disable Screen Blank & Screensaver (Kiosk Mode Only) -
-- name: Disable screen blanking and screensaver
-  ansible.builtin.copy:
-    content: |
-      [X11]
-      DPMSEnabled=false
-
-      [Screensaver]
-      IdleDelay=0
-      ScreenSaverEnabled=false
-    dest: "/etc/lightdm/lightdm.conf.d/99-noscreensaver.conf"
+# ── Task 16: Configure Screen Timeout (Kiosk Mode Only) ───────────
+- name: Configure screen blank timeout via DPMS and X11 screensaver
+  ansible.builtin.template:
+    src: "99-screen-timeout.conf.j2"
+    dest: "/etc/lightdm/lightdm.conf.d/99-screen-timeout.conf"
     owner: "root"
     group: "root"
     mode: "0644"

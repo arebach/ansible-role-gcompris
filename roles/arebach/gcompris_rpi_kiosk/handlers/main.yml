@@ -31,8 +31,19 @@
     state: "restarted"
 
 # ── Screen Blanking ───────────────────────────────────────────────
-# Applies DPMS / screen blanking settings immediately.
+# Applies DPMS / screen blanking settings immediately based on the
+# configured timeout value.
 - name: Apply DPMS settings
-  ansible.builtin.command:
-    cmd: "xset s off; xset -dpms; xset s noblank"
+  ansible.builtin.shell: |
+    if [ "{{ gcompris_screen_timeout_minutes | int }}" -eq 0 ]; then
+      xset s off
+      xset -dpms
+      xset s noblank
+    else
+      xset s {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }}
+      xset dpms {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }}
+      xset s on
+    fi
+  args:
+    executable: /bin/bash
   changed_when: true

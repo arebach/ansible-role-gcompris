@@ -71,8 +71,9 @@ gcompris_fullscreen: true
 gcompris_block_exit_keys: true
 
 # ── Screen Timeout / Saver ────────────────────────────────────────
-# Disable screen blanking and screen saver to keep display always on
-gcompris_disable_screensaver: true
+# Screen blank timeout in minutes. Set to 0 to disable screen blanking
+# entirely (display always on). Default: 15 minutes.
+gcompris_screen_timeout_minutes: 15
 
 # ── Touchscreen Calibration ────────────────────────────────────────
 # Enable tslib for capacitive touchscreens (e.g., official RPi touch
