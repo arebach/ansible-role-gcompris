@@ -33,7 +33,7 @@ env:
 jobs:
   # ── Job 1: Lint ────────────────────────────────────────────────
   lint:
-    name: Ansible Lint
+    name: ansible-lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -59,7 +59,7 @@ jobs:
 
   # ── Job 2: Test ────────────────────────────────────────────────
   test:
-    name: Molecule Test Suite
+    name: molecule
     runs-on: ubuntu-latest
     needs: [lint]
     steps:

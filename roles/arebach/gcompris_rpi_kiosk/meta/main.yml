@@ -10,7 +10,7 @@ galaxy_info:
   description: Ansible Galaxy role for deploying a child-safe GCompris kiosk on Raspberry Pi
   company: "Arebach Consulting"
   license: MIT
-  min_ansible_version: "2.14"
+  min_ansible_version: "2.15"
 
   platforms:
     - name: Debian
@@ -29,3 +29,4 @@ galaxy_info:
     - lightdm
     - touchscreen
     - agerestricted
+    - linux
