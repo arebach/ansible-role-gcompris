@@ -102,13 +102,23 @@
   failed_when: false
 
 # ── Task 7: Install Additional Kiosk Packages ────────────────────
-- name: Install supporting kiosk packages
+- name: Install required kiosk packages
   ansible.builtin.apt:
     name: "{{ gcompris_rpi_kiosk_packages }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600
   when: gcompris_rpi_kiosk_install is not failed
+
+- name: Install optional kiosk packages (tslib, libraspberrypi-bin)
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 3600
+  loop: "{{ gcompris_rpi_kiosk_optional_packages }}"
+  when: gcompris_rpi_kiosk_install is not failed
+  failed_when: false
 
 # ── Task 8: Deploy GCompris Kiosk Session Wrapper Script ─────────
 - name: Deploy the GCompris kiosk session wrapper script

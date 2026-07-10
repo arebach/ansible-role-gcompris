@@ -5,6 +5,7 @@
 #
 # ── Package Dependencies ──────────────────────────────────────────
 # Core packages required for kiosk operation and GCompris runtime.
+# These are installed first; failure of any stops the role.
 #
 gcompris_rpi_kiosk_packages:
   # GCompris main package (Qt version)
@@ -14,13 +15,19 @@ gcompris_rpi_kiosk_packages:
   - x11-xserver-utils
   # Autologin display manager
   - lightdm
+  # Network filtering (for "internal" mode)
+  - iptables
+  - ufw
+
+# ── Optional Packages ─────────────────────────────────────────────
+# These may not be available on all systems. Installed individually;
+# missing packages are skipped without failing the role.
+#
+gcompris_rpi_kiosk_optional_packages:
   # Input / touchscreen support
   - tslib
   # HDMI override utilities (tvservice is part of libraspberrypi-bin)
   - libraspberrypi-bin
-  # Network filtering (for "internal" mode)
-  - iptables
-  - ufw
 
 # ── Network Services ──────────────────────────────────────────────
 # Services stopped/disabled in "none" (air-gapped) mode
