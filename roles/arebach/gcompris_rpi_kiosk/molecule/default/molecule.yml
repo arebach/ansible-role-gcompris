@@ -5,7 +5,7 @@
 
 ---
 dependency:
-  name: galaxy
+  name: shell
   options:
     ignore-errors: true
 

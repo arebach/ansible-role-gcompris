@@ -115,7 +115,6 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3â€
 | `gcompris_force_hdmi` | `false` | Force HDMI output even if undetected |
 | `gcompris_enable_touchscreen` | `false` | Enable tslib for capacitive touch |
 | `gcompris_screen_timeout_minutes` | `15` | Screen blank timeout in minutes (0 = always on) |
-| `gcompris_block_exit_keys` | `true` | Block VT switch / X kill combinations |
 
 ## Network Modes in Detail
 
@@ -123,7 +122,7 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3â€
 No restrictions. GCompris can download A/V content packs, sync cloud saves, and use all network features.
 
 ### Internal-Only Mode (Recommended Default)
-Firewall rules allow traffic only to RFC1918 private ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) on ports 53 (DNS), 67/68 (DHCP), 22 (SSH), 80/443 (HTTP/HTTPS), 3389 (RDP). **Internet is blocked** â€” children cannot browse the web or access external servers. LAN games and local media sharing still work. Bluetooth is disabled.
+UFW firewall with default deny on both incoming and outgoing. Explicit allow rules for RFC1918 private ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) on ports 53 (DNS), 67 (DHCP), 22 (SSH), 80/443 (HTTP/HTTPS), 3389 (RDP). **Internet is blocked** â€” children cannot browse the web or access external servers. LAN games and local media sharing still work. Bluetooth is disabled.
 
 ### None (Air-Gapped) Mode
 All network services are stopped and disabled: Wi-Fi, Ethernet (via NetworkManager/dhcpcd), Bluetooth, and ModemManager. The device **cannot reach any network** â€” not even a local LAN. This is the maximum security posture.

@@ -52,23 +52,14 @@ gcompris_autologin_timeout: 0
 
 # ── Age Restriction ────────────────────────────────────────────────
 # Minimum age level (0-9) for activity filtering inside GCompris.
-# Higher values restrict the child to activities suitable for that age+.
-# GCompris levels: 0 (2 yr) through 9 (12+ yr).
+# Maps to GCompris difficulty 1-6 (level+1).
 gcompris_min_age_level: 0
 
-# ── Disable Activities Beyond Level ────────────────────────────────
+# ── Maximum Age Level ──────────────────────────────────────────────
 # Maximum age level (0-9) for activity filtering.
-# Set below 10 to lock out advanced activities.
+# Set below 9 to lock out advanced activities.
 # Default 9 = all activities unlocked.
 gcompris_max_age_level: 9
-
-# ── Fullscreen Startup ─────────────────────────────────────────────
-# Automatically launch GCompris in fullscreen mode
-gcompris_fullscreen: true
-
-# ── Exit Key Blocking ──────────────────────────────────────────────
-# Block common kiosk-exit key combinations
-gcompris_block_exit_keys: true
 
 # ── Screen Timeout / Saver ────────────────────────────────────────
 # Screen blank timeout in minutes. Set to 0 to disable screen blanking

@@ -24,25 +24,11 @@ gcompris_packages:
   - iptables
   - ufw
 
-# ── LightDM Greeter Theme ────────────────────────────────────────
-# Use the simplest greeter to avoid distractions
-gcompris_lightdm_greeter: lightdm-gtk-greeter
-
-# ── Network Modes ─────────────────────────────────────────────────
-# Firewall rules applied when gcompris_network_mode == "internal"
-gcompris_allowed_internal_ports:
-  - 53   # DNS
-  - 67   # DHCP
-  - 68   # DHCP
-  - 80   # HTTP (internal)
-  - 443  # HTTPS (internal)
-  - 22   # SSH (internal only)
-  - 3389 # RDP (internal)
-  - 8080 # Local proxy
-
-# Network services to stop/disable in "none" (air-gapped) mode
+# ── Network Services ──────────────────────────────────────────────
+# Services stopped/disabled in "none" (air-gapped) mode
 gcompris_network_services:
   - wpa_supplicant.service
   - NetworkManager.service
   - dhcpcd.service
   - bluetooth.service
+  - ModemManager.service

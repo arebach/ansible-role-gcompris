@@ -7,7 +7,7 @@
 # in classrooms or public areas where any network access would
 # violate policy.
 #
-# Services disabled:
+# Services disabled (from gcompris_network_services):
 #   - WPA Supplicant (Wi-Fi)
 #   - NetworkManager (Wi-Fi/Ethernet management)
 #   - dhcpcd (DHCP client)
@@ -17,39 +17,19 @@
 # Result: The device cannot reach any network — not LAN, not internet.
 
 ---
-- name: Stop and disable Wi-Fi service (WPA Supplicant)
+- name: Stop and disable network services
   ansible.builtin.systemd:
-    name: "wpa_supplicant.service"
+    name: "{{ item }}"
     state: "stopped"
     enabled: false
-  ignore_errors: true
+  loop: "{{ gcompris_network_services }}"
+  ignore_errors: true  # Some services may not exist on minimal installs
 
-- name: Stop and disable NetworkManager
+- name: Mask network services to prevent restart
   ansible.builtin.systemd:
-    name: "NetworkManager.service"
-    state: "stopped"
-    enabled: false
-  ignore_errors: true
-
-- name: Stop and disable DHCP client
-  ansible.builtin.systemd:
-    name: "dhcpcd.service"
-    state: "stopped"
-    enabled: false
-  ignore_errors: true
-
-- name: Stop and disable Bluetooth
-  ansible.builtin.systemd:
-    name: "bluetooth.service"
-    state: "stopped"
-    enabled: false
-  ignore_errors: true
-
-- name: Stop and disable ModemManager (cellular)
-  ansible.builtin.systemd:
-    name: "ModemManager.service"
-    state: "stopped"
-    enabled: false
+    name: "{{ item }}"
+    masked: true
+  loop: "{{ gcompris_network_services }}"
   ignore_errors: true
 
 - name: Disable USB networking (prevent Ethernet via USB adapter)
@@ -60,16 +40,7 @@
     mode: "0644"
   ignore_errors: true
 
-- name: Mask NetworkManager and wpa_supplicant
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    masked: true
-  loop:
-    - "NetworkManager.service"
-    - "wpa_supplicant.service"
-  ignore_errors: true
-
-- name: Deploy air-gapped indicator
+- name: Deploy air-gapped status indicator
   ansible.builtin.copy:
     content: |
       #!/bin/bash

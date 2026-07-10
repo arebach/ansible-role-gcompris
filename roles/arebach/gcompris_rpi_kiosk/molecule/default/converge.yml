@@ -1,6 +1,8 @@
 # GCompris RPi Kiosk — Molecule Default Converge Playbook
 # =========================================================
-# Applies the arebach.gcompris_rpi_kiosk role to the test container.
+# Applies the gcompris_rpi_kiosk role to the test container.
+# Uses a relative path to the role directory so molecule works
+# without requiring the role to be published to Galaxy first.
 
 ---
 - name: Converge GCompris RPi Kiosk role
@@ -9,4 +11,4 @@
   vars:
     gcompris_network_mode: "internal"
   roles:
-    - arebach.gcompris_rpi_kiosk
+    - role: "{{ playbook_dir }}/../.."

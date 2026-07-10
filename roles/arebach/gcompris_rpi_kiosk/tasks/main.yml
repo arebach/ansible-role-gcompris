@@ -70,7 +70,7 @@
 # ── Task 6: Install GCompris Package ─────────────────────────────
 - name: Install GCompris from Debian repository
   ansible.builtin.apt:
-    name: "{{ gcompris_version | default('gcompris', true) if gcompris_version | length > 0 else 'gcompris' }}"
+    name: "{{ gcompris_version if gcompris_version | length > 0 else 'gcompris' }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600
