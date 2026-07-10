@@ -1,0 +1,186 @@
+# GCompris RPi Kiosk — Diagnostics Playbook
+# ===========================================
+# Runs a full health check on every component in the boot-to-launch chain.
+# Use this when GCompris doesn't auto-start after reboot.
+#
+# Usage:
+#   ansible-playbook -i inventory.local.yml playbooks/diagnostics.yml
+#
+# Each task checks one link in the chain and prints a clear PASS/FAIL
+# with diagnostic detail so you can pinpoint exactly where it breaks:
+#
+#   Boot → LightDM enabled → LightDM running → Default DM set →
+#   Autologin config → XSession .desktop found → Session script
+#   executable → gcompris-qt installed → X11 not Wayland →
+#   Kiosk user exists with correct groups → Session actually active
+
+---
+- name: Diagnose GCompris kiosk boot-to-launch chain
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    _sep: "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  tasks:
+
+    # ── 1: LightDM service enabled on boot ────────────────────────
+    - name: "CHECK 1/11 — LightDM enabled on boot"
+      ansible.builtin.systemd:
+        name: lightdm
+        enabled: true
+      check_mode: true
+      register: _lightdm_enabled
+
+    - name: "Result 1 — LightDM enabled"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — LightDM is enabled' if not _lightdm_enabled.changed
+          else '❌ FAIL — LightDM is NOT enabled' }}
+
+    # ── 2: LightDM service currently running ─────────────────────
+    - name: "CHECK 2/11 — LightDM service running"
+      ansible.builtin.systemd:
+        name: lightdm
+        state: started
+      check_mode: true
+      register: _lightdm_active
+
+    - name: "Result 2 — LightDM running"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — LightDM is running' if not _lightdm_active.changed
+          else '❌ FAIL — LightDM is NOT running' }}
+
+    # ── 3: Default display manager set to LightDM ────────────────
+    - name: "CHECK 3/11 — Default display manager"
+      ansible.builtin.slurp:
+        path: /etc/X11/default-display-manager
+      register: _default_dm
+      failed_when: false
+
+    - name: "Result 3 — Default DM"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — Default DM is lightdm' if 'lightdm' in (_default_dm.content | default('') | b64decode)
+          else '❌ FAIL — Default DM is: ' + (_default_dm.content | default('N/A') | b64decode | default('N/A')) }}
+
+    # ── 4: Autologin config exists and references kiosk session ──
+    - name: "CHECK 4/11 — Autologin configuration"
+      ansible.builtin.slurp:
+        path: /etc/lightdm/lightdm.conf.d/10-autologin.conf
+      register: _autologin_conf
+      failed_when: false
+
+    - name: "Result 4 — Autologin config"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — Autologin config has user-session=gcompris-kiosk'
+          if 'user-session=gcompris-kiosk' in (_autologin_conf.content | default('') | b64decode)
+          else '❌ FAIL — Autologin config missing or wrong session: '
+            + (_autologin_conf.content | default('N/A') | b64decode | default('File not found')) }}
+
+    # ── 5: XSession .desktop file exists and has correct Type ────
+    - name: "CHECK 5/11 — XSession desktop entry"
+      ansible.builtin.slurp:
+        path: /usr/share/xsessions/gcompris-kiosk.desktop
+      register: _desktop_file
+      failed_when: false
+
+    - name: "Result 5 — XSession entry"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — .desktop has Type=XSession'
+          if 'Type=XSession' in (_desktop_file.content | default('') | b64decode)
+          else '❌ FAIL — .desktop missing or wrong Type: '
+            + (_desktop_file.content | default('N/A') | b64decode | default('File not found')) }}
+
+    # ── 6: Session script exists and is executable ───────────────
+    - name: "CHECK 6/11 — Session script exists and is executable"
+      ansible.builtin.stat:
+        path: /usr/local/bin/gcompris-kiosk-session.sh
+      register: _session_script
+
+    - name: "Result 6 — Session script"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — Script exists and is executable'
+          if _session_script.stat.exists and _session_script.stat.executable
+          else '❌ FAIL — Script '
+            + ('missing' if not _session_script.stat.exists else 'exists but NOT executable')
+            + ' at /usr/local/bin/gcompris-kiosk-session.sh' }}
+
+    # ── 7: gcompris-qt binary installed ──────────────────────────
+    - name: "CHECK 7/11 — gcompris-qt binary"
+      ansible.builtin.command: which gcompris-qt  # noqa: command-instead-of-module
+      register: _gcompris_bin
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 7 — gcompris-qt binary"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — gcompris-qt found at ' + _gcompris_bin.stdout
+          if _gcompris_bin.rc == 0
+          else '❌ FAIL — gcompris-qt not found in PATH. Install with: apt install gcompris-qt' }}
+
+    # ── 8: Display server is X11, not Wayland ────────────────────
+    - name: "CHECK 8/11 — Display server mode (X11 vs Wayland)"
+      ansible.builtin.shell: |
+        if [ -f /boot/firmware/config.txt ]; then
+          grep -i '^wayland' /boot/firmware/config.txt || echo "wayland_not_set"
+        else
+          echo "config_not_found"
+        fi
+      register: _wayland_setting
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 8 — Display server"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — X11 mode (wayland=0)'
+          if 'wayland=0' in _wayland_setting.stdout
+          else '❌ FAIL — Wayland may still be active: ' + _wayland_setting.stdout
+            + '. Fix: raspi-config nonint do_wayland x11' }}
+
+    # ── 9: Kiosk user exists with correct groups ─────────────────
+    - name: "CHECK 9/11 — Kiosk user and groups"
+      ansible.builtin.command: id {{ gcompris_rpi_kiosk_user | default('kiosk') }}  # noqa: command-instead-of-module
+      register: _kiosk_user
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 9 — Kiosk user"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — User exists with groups: ' + _kiosk_user.stdout
+          if _kiosk_user.rc == 0
+          else '❌ FAIL — Kiosk user does not exist: ' + _kiosk_user.stderr }}
+
+    # ── 10: LightDM logs for errors on current boot ──────────────
+    - name: "CHECK 10/11 — LightDM recent logs"
+      ansible.builtin.command: journalctl -u lightdm -b --no-pager -n 30  # noqa: command-instead-of-module
+      register: _lightdm_logs
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 10 — LightDM logs (last 30 lines)"
+      ansible.builtin.debug:
+        var: _lightdm_logs.stdout_lines
+
+    # ── 11: Active login sessions ────────────────────────────────
+    - name: "CHECK 11/11 — Active login sessions"
+      ansible.builtin.command: loginctl list-sessions --no-pager  # noqa: command-instead-of-module
+      register: _sessions
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 11 — Active sessions"
+      ansible.builtin.debug:
+        var: _sessions.stdout_lines
+
+    # ── Summary ──────────────────────────────────────────────────
+    - name: "Summary"
+      ansible.builtin.debug:
+        msg: "{{ _sep }} | Diagnostics complete — review any ❌ FAIL items above."

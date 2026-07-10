@@ -81,6 +81,28 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
   -e gcompris_rpi_kiosk_enable_touchscreen=yes
 ```
 
+### Diagnostics
+
+If GCompris doesn't auto-start after reboot, run the diagnostics playbook:
+
+```bash
+ansible-playbook -i inventory.yml playbooks/diagnostics.yml
+```
+
+This checks all 11 links in the boot-to-launch chain and reports ✅ PASS or ❌ FAIL for each:
+
+1. LightDM enabled on boot
+2. LightDM service currently running
+3. Default display manager set to LightDM
+4. Autologin config references `gcompris-kiosk` session
+5. `.desktop` entry has `Type=XSession`
+6. Session wrapper script exists and is executable
+7. `gcompris-qt` binary installed in PATH
+8. Display server is X11 (not Wayland)
+9. Kiosk user exists with correct device groups
+10. LightDM logs (last 30 lines from current boot)
+11. Active login sessions
+
 ## Variables Reference
 
 ### Network Modes (`gcompris_rpi_kiosk_network_mode`)
