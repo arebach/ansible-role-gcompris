@@ -1,31 +1,31 @@
 # GCompris RPi Kiosk — Screen Timeout Configuration
 # ====================================================
-# Deployed to: /etc/lightdm/lightdm.conf.d/99-screen-timeout.conf
+# Deployed to: /etc/X11/xorg.conf.d/99-screen-timeout.conf
 #
 # Controls DPMS (Display Power Management Signaling) and X11
-# screensaver timeout. Configured via gcompris_screen_timeout_minutes.
+# screensaver timeout via Xorg server flags. This is a proper
+# Xorg config file (NOT a LightDM conf.d file) so settings
+# persist across reboots.
 #
 # When timeout is 0: screen blanking fully disabled (always on)
 # When timeout > 0: screen blanks after N minutes of inactivity
 
 {% if gcompris_screen_timeout_minutes | int == 0 %}
 # Screen blanking disabled — display always on
-[X11]
-DPMSEnabled=false
-
-[Screensaver]
-IdleDelay=0
-ScreenSaverEnabled=false
+Section "ServerFlags"
+    Option "DPMS" "false"
+    Option "BlankTime" "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
 {% else %}
 # Screen blanks after {{ gcompris_screen_timeout_minutes }} minutes of inactivity
-[X11]
-DPMSEnabled=true
-DPMSSuspendTime={{ gcompris_screen_timeout_minutes }}
-DPMSStandbyTime={{ gcompris_screen_timeout_minutes }}
-DPMSCycle={{ gcompris_screen_timeout_minutes }}
-
-[Screensaver]
-IdleDelay={{ gcompris_screen_timeout_minutes }}
-ScreenSaverEnabled=true
-Cycle={{ gcompris_screen_timeout_minutes }}
+Section "ServerFlags"
+    Option "DPMS" "true"
+    Option "BlankTime" "{{ gcompris_screen_timeout_minutes }}"
+    Option "StandbyTime" "{{ gcompris_screen_timeout_minutes }}"
+    Option "SuspendTime" "{{ gcompris_screen_timeout_minutes }}"
+    Option "OffTime" "{{ gcompris_screen_timeout_minutes }}"
+EndSection
 {% endif %}

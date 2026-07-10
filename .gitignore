@@ -10,7 +10,7 @@ molecule/default/certs/
 molecule/default/*.pid
 molecule/default/logs/
 molecule/default/playbook.out
-roles/arebach/gcompris_rpi_kiosk/molecule/
+roles/arebach/gcompris_rpi_kiosk/molecule/default/.molecule/
 
 # ── IDE ───────────────────────────────────────────────────────────
 .idea/

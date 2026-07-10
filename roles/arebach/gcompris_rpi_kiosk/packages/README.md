@@ -27,7 +27,7 @@ At minimum, include these packages:
 - `xscreensaver` — screen blanking control
 - `x11-utils` + `x11-xserver-utils` — X11 tools
 - `ufw` + `iptables` — firewall (for internal/none network modes)
-- `tvservice` — HDMI configuration
+- `libraspberrypi-bin` — HDMI configuration (provides `tvservice` utility)
 
 ## After copying
 

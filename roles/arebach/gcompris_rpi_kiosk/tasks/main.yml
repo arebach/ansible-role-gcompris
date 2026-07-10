@@ -70,7 +70,7 @@
 # ── Task 6: Install GCompris Package ─────────────────────────────
 - name: Install GCompris from Debian repository
   ansible.builtin.apt:
-    name: "{{ gcompris_version if gcompris_version | length > 0 else 'gcompris' }}"
+    name: "{{ gcompris_version | default('gcompris', true) }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600
@@ -173,10 +173,10 @@
   when: gcompris_kiosk_mode | bool
 
 # ── Task 16: Configure Screen Timeout (Kiosk Mode Only) ───────────
-- name: Configure screen blank timeout via DPMS and X11 screensaver
+- name: Configure screen blank timeout via Xorg DPMS and screensaver flags
   ansible.builtin.template:
     src: "99-screen-timeout.conf.j2"
-    dest: "/etc/lightdm/lightdm.conf.d/99-screen-timeout.conf"
+    dest: "/etc/X11/xorg.conf.d/99-screen-timeout.conf"
     owner: "root"
     group: "root"
     mode: "0644"

@@ -22,9 +22,9 @@ gcompris_kiosk_mode: yes
 # ── Network Restriction Mode ──────────────────────────────────────
 # Controls network access at the OS level after provisioning:
 #
-#   "full"      — All network services remain active (default)
+#   "full"      — All network services remain active
 #                 Internet access for A/V downloads, cloud saves, etc.
-#   "internal"  — Network stack active but internet blocked
+#   "internal"  — Network stack active but internet blocked (DEFAULT)
 #                 Firewall rules allow only private ranges (10.0.0.0/8,
 #                 172.16.0.0/12, 192.168.0.0/16) on common ports.
 #                 Internal LAN features work; cloud/A/V downloads blocked.

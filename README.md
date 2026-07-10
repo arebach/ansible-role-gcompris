@@ -15,9 +15,9 @@ This role provisions a Raspberry Pi as a **dedicated educational kiosk** running
 - **3 network modes** — full access, internal-only (recommended), or air-gapped
 - **Age-level filtering** — restrict activities to specific developmental stages
 - **Autologin + auto-start** — boots directly into GCompris, no login screen
-- **Screensaver disabled** — display stays always-on for unattended use
+- **Configurable screen timeout** — display blanks after N minutes of inactivity (default 15, or 0 for always-on)
 - **Touchscreen ready** — optional tslib calibration for capacitive touch displays
-- **Molecule-tested** — CI/CD validates configuration in Docker containers
+- **Molecule-tested** — CI/CD validates configuration files in Docker containers (static config verification, not runtime)
 - **Galaxy-compatible** — follows `arebach` namespace, Debian Bookworm target
 
 ## Installation
@@ -136,6 +136,7 @@ ansible-role-gcompris/
 ├── playbooks/provision.yml       # Example deployment playbook
 ├── inventory.yml                 # Example host inventory
 ├── vars/deployment.yml           # Override examples
+├── gcompris-configuration.md    # GCompris CLI flag reference (in docs/)
 ├── roles/arebach/gcompris_rpi_kiosk/
 │   ├── defaults/main.yml         # Overridable defaults (documented above)
 │   ├── vars/main.yml             # Internal variables, package lists
@@ -145,11 +146,13 @@ ansible-role-gcompris/
 │   ├── tasks/network-none.yml    # Network mode: none (air-gapped)
 │   ├── handlers/main.yml         # Service restarts (LightDM, logind, UFW)
 │   ├── templates/
-│   │   ├── 10-autologin.conf.j2  # LightDM autologin config
+│   │   ├── 10-autologin.conf.j2       # LightDM autologin config
 │   │   ├── gcompris-kiosk-session.j2  # Kiosk wrapper script
-│   │   └── gcompris-kiosk.desktop.j2    # Session .desktop file
+│   │   ├── gcompris-kiosk.desktop.j2  # Session .desktop file
+│   │   └── 99-screen-timeout.conf.j2  # Xorg DPMS / screen blanking config
 │   ├── files/
 │   │   └── 10-kiosk.conf         # X11 server flags (DontVTSwitch, DontZap)
+│   ├── packages/                 # Offline .deb staging directory
 │   ├── meta/main.yml             # Galaxy metadata
 │   └── molecule/default/         # Molecule test suite (Docker-based)
 ├── .gitignore
@@ -171,6 +174,7 @@ The GitHub Actions pipeline runs on every push/PR:
 - **Age filtering** is the third layer — ensures age-appropriate content
 - **Air-gap mode** is the fourth layer — complete physical network isolation
 - All three layers work together; none alone is sufficient for unattended deployment
+- **Inventory passwords** — the example `inventory.yml` contains a placeholder password. For real deployments, use `ansible-vault` to encrypt secrets or configure SSH key-based authentication instead of `ansible_become_pass`
 
 ## License
 
