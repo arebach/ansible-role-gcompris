@@ -105,9 +105,10 @@
     - { net: "192.168.0.0/16" }
 
 - name: Enable UFW
-  ansible.builtin.command:
-    cmd: "ufw --force enable"
+  ansible.builtin.shell: |
+    timeout 30 ufw --force enable
   changed_when: true
+  failed_when: false
 
 - name: Disable Bluetooth (reduce wireless attack surface)
   ansible.builtin.systemd:
