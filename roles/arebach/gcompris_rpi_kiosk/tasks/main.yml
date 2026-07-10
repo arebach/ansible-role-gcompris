@@ -19,6 +19,16 @@
 #   Lower numbers = activities for younger children.
 
 ---
+# ── Pre-Task: Clear Existing UFW Rules ───────────────────────────
+# Network restrictions from a previous run may still be active and
+# block apt from reaching package repositories. Flush them first.
+- name: Flush existing UFW rules to allow package installation
+  ansible.builtin.shell: |
+    ufw --force reset
+    ufw --force disable
+  changed_when: false
+  failed_when: false
+
 # ── Task 1: Create Required Directories ──────────────────────────
 - name: Ensure target directories exist on the host
   ansible.builtin.file:
