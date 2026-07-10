@@ -51,7 +51,7 @@
   when:
     - gcompris_rpi_kiosk_force_x11 | bool
     - gcompris_rpi_kiosk_raspi_config_check.rc == 0
-  timeout: 30
+  timeout: 180
   failed_when: false
   notify: Restart LightDM Service
 
