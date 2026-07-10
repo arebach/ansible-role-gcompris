@@ -3,10 +3,6 @@
 # These variables have the lowest precedence and can be overridden
 # during deployment via inventory or command-line variables.
 #
-# ── GCompris Version ──────────────────────────────────────────────
-# Default: latest from Debian repos
-gcompris_rpi_kiosk_version: ""
-
 # ── Kiosk Mode ────────────────────────────────────────────────────
 # When enabled, the system runs as a single-purpose kiosk with:
 #   - Fullscreen mode (no window decorations)

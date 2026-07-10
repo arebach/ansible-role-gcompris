@@ -15,8 +15,11 @@ This role provisions a Raspberry Pi as a **dedicated educational kiosk** running
 - **3 network modes** — full access, internal-only (recommended), or air-gapped
 - **Age-level filtering** — restrict activities to specific developmental stages
 - **Autologin + auto-start** — boots directly into GCompris, no login screen
+- **Auto-reboot** — optionally reboots the Pi after provisioning so all changes take effect
+- **UFW safety flush** — clears stale firewall rules before installing packages (prevents apt lockup from previous network restrictions)
 - **Configurable screen timeout** — display blanks after N minutes of inactivity (default 15, or 0 for always-on)
 - **Touchscreen ready** — optional tslib calibration for capacitive touch displays
+- **Diagnostics playbook** — 11-check health check for the entire boot-to-launch chain
 - **Molecule-tested** — CI/CD validates configuration files in Docker containers (static config verification, not runtime)
 - **Galaxy-compatible** — follows `arebach` namespace, Debian Bookworm target
 
@@ -48,8 +51,14 @@ cd ansible-role-gcompris
 #    ssh-copy-id pi@192.168.1.100
 #    (then remove ansible_password from inventory)
 
-# 3. Run the playbook
+# 3. Run the playbook (Pi will auto-reboot at the end)
 ansible-playbook -i inventory.yml playbooks/provision.yml
+
+# 4. After reboot, the Pi auto-logs in as the kiosk user
+#    and launches GCompris in fullscreen kiosk mode.
+#    Manual login credentials (if autologin fails):
+#      Username: kiosk
+#      Password: kiosk
 ```
 
 ### Customization Examples
@@ -89,19 +98,20 @@ If GCompris doesn't auto-start after reboot, run the diagnostics playbook:
 ansible-playbook -i inventory.yml playbooks/diagnostics.yml
 ```
 
-This checks all 11 links in the boot-to-launch chain and reports ✅ PASS or ❌ FAIL for each:
+This checks all links in the boot-to-launch chain and reports ✅ PASS or ❌ FAIL for each:
 
 1. LightDM enabled on boot
 2. LightDM service currently running
 3. Default display manager set to LightDM
 4. Autologin config references `gcompris-kiosk` session
-5. `.desktop` entry has `Type=XSession`
-6. Session wrapper script exists and is executable
-7. `gcompris-qt` binary installed in PATH
-8. Display server is X11 (not Wayland)
-9. Kiosk user exists with correct device groups
-10. LightDM logs (last 30 lines from current boot)
-11. Active login sessions
+5. No conflicting autologin in main `lightdm.conf`
+6. `.desktop` entry has `Type=XSession` (and no unsupported session types)
+7. Session wrapper script exists and is executable
+8. `gcompris-qt` binary installed in PATH
+9. Display server is X11 (not Wayland)
+10. Kiosk user exists with correct device groups
+11. LightDM logs (last 30 lines from current boot)
+12. Active login sessions
 
 ## Variables Reference
 
@@ -145,13 +155,12 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 
 ### System Configuration
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `gcompris_rpi_kiosk_user` | `"kiosk"` | Dedicated system user for the kiosk session |
-| `gcompris_rpi_kiosk_group` | `"kiosk"` | System group for the kiosk user |
-| `gcompris_rpi_kiosk_version` | `""` | Pin GCompris-Qt version (empty = latest) |
-| `gcompris_rpi_kiosk_autologin_timeout` | `0` | LightDM autologin delay in seconds (0 = immediate) |
-| `gcompris_rpi_kiosk_local_pkg_dir` | `/var/cache/gcompris_rpi_kiosk_pkg` | Offline package staging directory |
+- **`gcompris_rpi_kiosk_user`** — `"kiosk"` — Dedicated system user for the kiosk session
+- **`gcompris_rpi_kiosk_group`** — `"kiosk"` — System group for the kiosk user
+- **`gcompris_rpi_kiosk_password`** — `"kiosk"` — Password for the kiosk user (used for manual login if autologin fails; change for production)
+- **`gcompris_rpi_kiosk_autologin_timeout`** — `0` — LightDM autologin delay in seconds (0 = immediate)
+- **`gcompris_rpi_kiosk_local_pkg_dir`** — `/var/cache/gcompris_rpi_kiosk_pkg` — Offline package staging directory
+- **`gcompris_rpi_kiosk_reboot`** — `true` — Reboot the Pi after provisioning so all changes take effect (set to `false` for CI/CD)
 
 ## Network Modes in Detail
 
@@ -169,16 +178,20 @@ All network services are stopped and disabled: Wi-Fi, Ethernet (via NetworkManag
 ```
 ansible-role-gcompris/
 ├── galaxy.yml                    # Galaxy metadata for publishing
+├── CHANGELOG.md                 # Version history
 ├── .github/workflows/ci-cd.yml   # Lint → Molecule → Galaxy pipeline
-├── playbooks/provision.yml       # Example deployment playbook
+├── playbooks/
+│   ├── provision.yml             # Example deployment playbook
+│   └── diagnostics.yml           # Boot-to-launch chain health check
 ├── inventory.yml                 # Example host inventory
 ├── vars/deployment.yml           # Override examples
 ├── docs/
 │   └── gcompris-configuration.md # GCompris CLI flag reference
+├── meta/runtime.yml              # Galaxy runtime requirements
 ├── roles/arebach/gcompris_rpi_kiosk/
 │   ├── defaults/main.yml         # Overridable defaults (documented above)
 │   ├── vars/main.yml             # Internal variables, package lists
-│   ├── tasks/main.yml            # 19 provisioning tasks
+│   ├── tasks/main.yml            # 20 provisioning tasks + pre-tasks
 │   ├── tasks/network-full.yml    # Network mode: full
 │   ├── tasks/network-internal.yml # Network mode: internal
 │   ├── tasks/network-none.yml    # Network mode: none (air-gapped)
@@ -186,13 +199,14 @@ ansible-role-gcompris/
 │   ├── templates/
 │   │   ├── 10-autologin.conf.j2       # LightDM autologin config
 │   │   ├── gcompris-kiosk-session.j2  # Kiosk wrapper script
-│   │   ├── gcompris-kiosk.desktop.j2  # Session .desktop file
+│   │   ├── gcompris-kiosk.desktop.j2  # Session .desktop file (Type=XSession)
 │   │   └── 99-screen-timeout.conf.j2  # Xorg DPMS / screen blanking config
 │   ├── files/
 │   │   └── 10-kiosk.conf         # X11 server flags (DontVTSwitch, DontZap)
 │   ├── packages/                 # Offline .deb staging directory
 │   ├── meta/main.yml             # Galaxy metadata
 │   ├── meta/requirements.yml     # Collection dependencies (community.general)
+│   ├── meta/runtime.yml           # Role runtime requirements
 │   └── molecule/default/         # Molecule test suite (Docker-based)
 ├── .gitignore
 └── README.md
@@ -213,6 +227,7 @@ The GitHub Actions pipeline runs on every push/PR:
 - **Age filtering** is the third layer — ensures age-appropriate content
 - **Air-gap mode** is the fourth layer — complete physical network isolation
 - All four layers work together; none alone is sufficient for unattended deployment
+- **Kiosk user password** — default is `"kiosk"`; change via `gcompris_rpi_kiosk_password` for production
 - **Inventory passwords** — the example `inventory.yml` contains placeholder values for both `ansible_password` (SSH login) and `ansible_become_pass` (sudo). For real deployments, use `ansible-vault` to encrypt the inventory file or configure SSH key-based authentication via `ssh-copy-id` and remove both password fields
 
 ## License
