@@ -17,7 +17,7 @@
   ansible.builtin.apt:
     name: "ufw"
     state: "present"
-    update_cache: true
+    update_cache: false
 
 - name: Set UFW default policy — deny incoming
   community.general.ufw:
