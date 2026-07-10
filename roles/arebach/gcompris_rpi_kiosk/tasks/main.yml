@@ -29,6 +29,12 @@
   changed_when: false
   failed_when: false
 
+# ── Pre-Task: Ensure apt cache is fresh ───────────────────────────
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
 # ── Task 1: Create Required Directories ──────────────────────────
 - name: Ensure target directories exist on the host
   ansible.builtin.file:

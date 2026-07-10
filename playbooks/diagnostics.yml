@@ -110,10 +110,11 @@
     - name: "Result 5 — XSession entry"
       ansible.builtin.debug:
         msg: >-
-          {{ '✅ PASS — .desktop has Type=XSession'
+          {{ '✅ PASS — .desktop has Type=XSession and no unsupported session type'
           if 'Type=XSession' in (_desktop_file.content | default('') | b64decode)
-          else '❌ FAIL — .desktop missing or wrong Type: '
-            + (_desktop_file.content | default('N/A') | b64decode | default('File not found')) }}
+             and 'X-LightDM-Session-Type' not in (_desktop_file.content | default('') | b64decode)
+          else '❌ FAIL — .desktop has Type=' + (_desktop_file.content | default('N/A') | b64decode | default('File not found'))
+            + ' or has unsupported X-LightDM-Session-Type' }}
 
     # ── 6: Session script exists and is executable ───────────────
     - name: "CHECK 6/11 — Session script exists and is executable"
