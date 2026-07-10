@@ -36,12 +36,35 @@
     - "/usr/local/bin"
 
 # ── Task 2: Force X11 Display Compositor ─────────────────────────
+- name: Check if raspi-config is available
+  ansible.builtin.command:
+    cmd: "which raspi-config"
+  register: gcompris_rpi_kiosk_raspi_config_check
+  changed_when: false
+  failed_when: false
+
 - name: Force Raspberry Pi OS display compositor to X11 mode
   ansible.builtin.command:
     cmd: "raspi-config nonint do_wayland x11"
   register: gcompris_rpi_kiosk_x11_result
   changed_when: gcompris_rpi_kiosk_x11_result.rc == 0
-  when: gcompris_rpi_kiosk_force_x11 | bool
+  when:
+    - gcompris_rpi_kiosk_force_x11 | bool
+    - gcompris_rpi_kiosk_raspi_config_check.rc == 0
+  timeout: 30
+  failed_when: false
+  notify: Restart LightDM Service
+
+- name: Fallback — set X11 via boot config (when raspi-config unavailable or failed)
+  ansible.builtin.lineinfile:
+    path: "/boot/firmware/config.txt"
+    regexp: "^#?wayland"
+    line: "wayland=0"
+    create: true
+    mode: "0644"
+  when:
+    - gcompris_rpi_kiosk_force_x11 | bool
+    - gcompris_rpi_kiosk_raspi_config_check.rc != 0 or gcompris_rpi_kiosk_x11_result is failed or gcompris_rpi_kiosk_x11_result.failed | default(false)
   notify: Restart LightDM Service
 
 # ── Task 3: Force HDMI Output (Optional) ─────────────────────────
