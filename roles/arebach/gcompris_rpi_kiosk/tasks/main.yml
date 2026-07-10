@@ -94,14 +94,13 @@
 # ── Task 6: Install GCompris Package ─────────────────────────────
 - name: Install GCompris from Debian repository
   ansible.builtin.apt:
-    name: "{{ gcompris_rpi_kiosk_version | default('gcompris-qt', true) }}"
-    state: "present"
+    name: "gcompris-qt"
+    state: present
     update_cache: true
     cache_valid_time: 3600
   register: gcompris_rpi_kiosk_install
   retries: 3
   delay: 10
-  failed_when: false
 
 # ── Task 7: Install Additional Kiosk Packages ────────────────────
 - name: Install required kiosk packages
@@ -151,7 +150,24 @@
     mode: "0644"
   notify: Restart LightDM Service
 
-# ── Task 10b: Ensure LightDM is the Default Display Manager ──────
+# ── Task 10b: Remove Conflicting Autologin from Main lightdm.conf ─
+# Raspberry Pi OS sets autologin-user in /etc/lightdm/lightdm.conf directly.
+# That file is loaded LAST and overrides anything in lightdm.conf.d/.
+# We must strip those lines so our 10-autologin.conf takes effect.
+- name: Remove conflicting autologin from main lightdm.conf
+  ansible.builtin.lineinfile:
+    path: "/etc/lightdm/lightdm.conf"
+    regexp: "{{ item }}"
+    state: absent
+  loop:
+    - "^autologin-user="
+    - "^autologin-user-timeout="
+    - "^user-session="
+    - "^autologin-session="
+  failed_when: false
+  notify: Restart LightDM Service
+
+# ── Task 10c: Ensure LightDM is the Default Display Manager ──────
 - name: Set LightDM as the default display manager
   ansible.builtin.copy:
     content: "/usr/sbin/lightdm\n"

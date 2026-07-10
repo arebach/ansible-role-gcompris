@@ -80,6 +80,26 @@
           else '❌ FAIL — Autologin config missing or wrong session: '
             + (_autologin_conf.content | default('N/A') | b64decode | default('File not found')) }}
 
+    # ── 4b: Check for conflicting autologin in main lightdm.conf ─
+    - name: "CHECK 4b/11 — No conflicting autologin in main lightdm.conf"
+      ansible.builtin.shell: |
+        set -o pipefail
+        if [ -f /etc/lightdm/lightdm.conf ]; then
+          grep -E '^(autologin-user|user-session|autologin-session)=' /etc/lightdm/lightdm.conf || echo "NO_CONFLICTS"
+        else
+          echo "NO_MAIN_CONF"
+        fi
+      register: _main_conf_conflicts
+      changed_when: false
+      failed_when: false
+
+    - name: "Result 4b — Main lightdm.conf conflicts"
+      ansible.builtin.debug:
+        msg: >-
+          {{ '✅ PASS — No conflicting autologin in main lightdm.conf'
+          if 'NO_CONFLICTS' in _main_conf_conflicts.stdout or 'NO_MAIN_CONF' in _main_conf_conflicts.stdout
+          else '❌ FAIL — Main lightdm.conf overrides autologin! Remove these lines from /etc/lightdm/lightdm.conf:\n' + _main_conf_conflicts.stdout }}
+
     # ── 5: XSession .desktop file exists and has correct Type ────
     - name: "CHECK 5/11 — XSession desktop entry"
       ansible.builtin.slurp:
