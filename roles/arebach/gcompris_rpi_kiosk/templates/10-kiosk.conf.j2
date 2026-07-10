@@ -1,0 +1,26 @@
+# GCompris RPi Kiosk — X11 Security Server Flags
+# Deployed to: /etc/X11/xorg.conf.d/10-kiosk.conf
+#
+# These flags lock down the X server to prevent escape from the kiosk
+# session via keyboard shortcuts.
+
+Section "ServerFlags"
+    # DontVTSwitch — blocks Ctrl+Alt+Fn (virtual terminal switching)
+    # Always enabled in kiosk mode; no reason to allow VT access.
+    Option "DontVTSwitch" "True"
+
+{% if gcompris_rpi_kiosk_block_zap | bool %}
+    # DontZap — blocks Ctrl+Alt+Backspace (X server termination)
+    # Enabled by default for maximum kiosk security.
+    # Set gcompris_rpi_kiosk_block_zap=false to allow Ctrl+Alt+Backspace
+    # as a maintenance exit shortcut.
+    Option "DontZap" "True"
+{% else %}
+    # DontZap is DISABLED — Ctrl+Alt+Backspace will terminate the X server
+    # and return to the LightDM greeter. Use this for maintenance access.
+    Option "DontZap" "False"
+{% endif %}
+
+    # AllowClosedownGrabs — prevents clients from grabbing the server
+    Option "AllowClosedownGrabs" "False"
+EndSection

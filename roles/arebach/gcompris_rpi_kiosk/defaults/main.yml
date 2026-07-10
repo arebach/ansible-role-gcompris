@@ -78,6 +78,12 @@ gcompris_rpi_kiosk_enable_touchscreen: false
 # first-time headless setup or stubborn displays)
 gcompris_rpi_kiosk_force_hdmi: false
 
+# ── X11 Zap (Ctrl+Alt+Backspace) ──────────────────────────────────
+# When true (default), Ctrl+Alt+Backspace is blocked (DontZap=True).
+# When false, Ctrl+Alt+Backspace kills the X server and returns to the
+# LightDM greeter — useful for maintenance access without SSH.
+gcompris_rpi_kiosk_block_zap: true
+
 # ── Reboot After Provisioning ──────────────────────────────────────
 # Reboot the Pi at the end of the playbook so all changes (LightDM
 # autologin, X11 mode, kernel params, UFW rules) take effect.

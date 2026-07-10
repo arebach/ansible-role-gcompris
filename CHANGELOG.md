@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- **Feature: configurable Ctrl+Alt+Backspace exit** — new `gcompris_rpi_kiosk_block_zap` variable (default: `true`); set to `false` to allow `Ctrl+Alt+Backspace` to kill the X server and return to the LightDM greeter for maintenance
+- Converted `10-kiosk.conf` from static file to Jinja2 template (`10-kiosk.conf.j2`) with conditional `DontZap` based on the new variable
+- `DontVTSwitch` remains always-on (no reason to allow VT switching in kiosk mode)
+- Removed empty `files/` directory
+- Updated molecule verify.yml and README documentation
+
 ## 1.1.0
 
 - **Fix: kiosk autostart** — `.desktop` entry changed from `Type=Application` to `Type=XSession` (required by LightDM for session entries)

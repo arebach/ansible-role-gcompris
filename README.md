@@ -90,6 +90,13 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
   -e gcompris_rpi_kiosk_enable_touchscreen=yes
 ```
 
+**Allow Ctrl+Alt+Backspace as maintenance exit:**
+```bash
+ansible-playbook -i inventory.yml playbooks/provision.yml \
+  -e gcompris_rpi_kiosk_block_zap=false
+```
+When zap is unblocked, pressing `Ctrl+Alt+Backspace` kills the X server and returns to the LightDM greeter for maintenance login. GCompris auto-restarts on next login.
+
 ### Diagnostics
 
 If GCompris doesn't auto-start after reboot, run the diagnostics playbook:
@@ -146,12 +153,11 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 
 ### Display & Input
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `gcompris_rpi_kiosk_force_x11` | `true` | Force X11 compositor (required for kiosk) |
-| `gcompris_rpi_kiosk_force_hdmi` | `false` | Force HDMI output even if undetected |
-| `gcompris_rpi_kiosk_enable_touchscreen` | `false` | Enable tslib for capacitive touch |
-| `gcompris_rpi_kiosk_screen_timeout_minutes` | `15` | Screen blank timeout in minutes (0 = always on) |
+- **`gcompris_rpi_kiosk_force_x11`** — `true` — Force X11 compositor (required for kiosk)
+- **`gcompris_rpi_kiosk_force_hdmi`** — `false` — Force HDMI output even if undetected
+- **`gcompris_rpi_kiosk_enable_touchscreen`** — `false` — Enable tslib for capacitive touch
+- **`gcompris_rpi_kiosk_screen_timeout_minutes`** — `15` — Screen blank timeout in minutes (0 = always on)
+- **`gcompris_rpi_kiosk_block_zap`** — `true` — Block `Ctrl+Alt+Backspace` (X server kill). Set to `false` to allow it as a maintenance exit shortcut — kills GCompris and returns to the LightDM greeter
 
 ### System Configuration
 
@@ -198,11 +204,10 @@ ansible-role-gcompris/
 │   ├── handlers/main.yml         # Service restarts (LightDM, logind, DPMS)
 │   ├── templates/
 │   │   ├── 10-autologin.conf.j2       # LightDM autologin config
+│   │   ├── 10-kiosk.conf.j2           # X11 security flags (DontVTSwitch, conditional DontZap)
 │   │   ├── gcompris-kiosk-session.j2  # Kiosk wrapper script
 │   │   ├── gcompris-kiosk.desktop.j2  # Session .desktop file (Type=XSession)
 │   │   └── 99-screen-timeout.conf.j2  # Xorg DPMS / screen blanking config
-│   ├── files/
-│   │   └── 10-kiosk.conf         # X11 server flags (DontVTSwitch, DontZap)
 │   ├── packages/                 # Offline .deb staging directory
 │   ├── meta/main.yml             # Galaxy metadata
 │   ├── meta/requirements.yml     # Collection dependencies (community.general)

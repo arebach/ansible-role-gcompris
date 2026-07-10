@@ -89,7 +89,7 @@
       changed_when: false
       when: gcompris_rpi_kiosk_mode | bool
 
-    - name: Verify X11 configuration content (DontVTSwitch and DontZap)
+    - name: Verify X11 configuration content (DontVTSwitch always, DontZap conditional)
       ansible.builtin.assert:
         that:
           - "'DontVTSwitch' in gcompris_rpi_kiosk_xorg_content.stdout"

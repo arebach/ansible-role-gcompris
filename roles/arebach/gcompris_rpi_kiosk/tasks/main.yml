@@ -224,13 +224,14 @@
 
 # ── Task 13: Deploy X11 Security Server Flags (Kiosk Mode Only) ──
 - name: Apply X11 security flags to block console escape keys
-  ansible.builtin.copy:
-    src: "10-kiosk.conf"
+  ansible.builtin.template:
+    src: "10-kiosk.conf.j2"
     dest: "/etc/X11/xorg.conf.d/10-kiosk.conf"
     owner: "root"
     group: "root"
     mode: "0644"
   when: gcompris_rpi_kiosk_mode | bool
+  notify: Restart LightDM Service
 
 # ── Task 14: Deploy logind Modifications (Kiosk Mode Only) ───────
 - name: Deploy logind configuration to disable virtual terminals
