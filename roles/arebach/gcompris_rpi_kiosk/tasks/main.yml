@@ -24,8 +24,18 @@
 # block apt from reaching package repositories. Flush them first.
 - name: Flush existing UFW rules to allow package installation
   ansible.builtin.shell: |
-    ufw --force reset
-    ufw --force disable
+    ufw --force reset || true
+    ufw --force disable || true
+    iptables -F || true
+    iptables -X || true
+    iptables -P INPUT ACCEPT || true
+    iptables -P FORWARD ACCEPT || true
+    iptables -P OUTPUT ACCEPT || true
+    ip6tables -F || true
+    ip6tables -X || true
+    ip6tables -P INPUT ACCEPT || true
+    ip6tables -P FORWARD ACCEPT || true
+    ip6tables -P OUTPUT ACCEPT || true
   changed_when: false
   failed_when: false
 
@@ -37,11 +47,15 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  retries: 3
+  delay: 10
   when: gcompris_rpi_kiosk_update_system | bool
 
 - name: Upgrade all packages (dist-upgrade)
   ansible.builtin.apt:
     upgrade: dist
+  retries: 2
+  delay: 15
   when: gcompris_rpi_kiosk_update_system | bool
 
 # ── Task 1: Create Required Directories ──────────────────────────
