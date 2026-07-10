@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+- **Feature: OS update and upgrade** — new `gcompris_rpi_kiosk_update_system` variable (default: `true`) runs `apt-get update` and `apt-get dist-upgrade` as the very first action before any kiosk provisioning. Ensures the host OS is fully patched. Disable with `-e gcompris_rpi_kiosk_update_system=false` for offline reprovisioning.
+
 ## 1.2.0
 
 - **Feature: configurable Ctrl+Alt+Backspace exit** — new `gcompris_rpi_kiosk_block_zap` variable (default: `false`); `Ctrl+Alt+Backspace` kills the X server and returns to the LightDM greeter for maintenance. Set to `true` for full lockdown in unattended deployments.

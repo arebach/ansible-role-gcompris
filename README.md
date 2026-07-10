@@ -90,6 +90,12 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
   -e gcompris_rpi_kiosk_mode=false
 ```
 
+**Skip OS update (offline/air-gapped reprovisioning):**
+```bash
+ansible-playbook -i inventory.yml playbooks/provision.yml \
+  -e gcompris_rpi_kiosk_update_system=false
+```
+
 **With touchscreen support:**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
@@ -177,6 +183,7 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 - **`gcompris_rpi_kiosk_autologin_timeout`** — `0` — LightDM autologin delay in seconds (0 = immediate)
 - **`gcompris_rpi_kiosk_local_pkg_dir`** — `/var/cache/gcompris_rpi_kiosk_pkg` — Offline package staging directory
 - **`gcompris_rpi_kiosk_reboot`** — `true` — Reboot the Pi after provisioning so all changes take effect (set to `false` for CI/CD)
+- **`gcompris_rpi_kiosk_update_system`** — `true` — Run `apt-get update && dist-upgrade` as the first action before any provisioning. Ensures the host OS is fully patched. Disable with `false` (e.g. for offline/air-gapped reprovisioning)
 
 ## Network Modes in Detail
 

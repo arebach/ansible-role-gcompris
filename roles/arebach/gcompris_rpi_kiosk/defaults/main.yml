@@ -3,6 +3,13 @@
 # These variables have the lowest precedence and can be overridden
 # during deployment via inventory or command-line variables.
 #
+# ── System Update ──────────────────────────────────────────────────
+# When true (default), runs apt-get update && apt-get dist-upgrade as
+# the very first action before any kiosk provisioning begins.
+# Ensures the host OS and all packages are fully patched.
+# Disable with: -e gcompris_rpi_kiosk_update_system=false
+gcompris_rpi_kiosk_update_system: true
+
 # ── Kiosk Mode ────────────────────────────────────────────────────
 # When enabled, the system runs as a single-purpose kiosk with:
 #   - Fullscreen mode (no window decorations)

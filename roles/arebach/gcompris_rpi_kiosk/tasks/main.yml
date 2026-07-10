@@ -29,11 +29,20 @@
   changed_when: false
   failed_when: false
 
-# ── Pre-Task: Ensure apt cache is fresh ───────────────────────────
+# ── Pre-Task: Update and Upgrade OS ──────────────────────────────
+# Applies security patches and package updates to the host OS before
+# any kiosk provisioning begins. Ensures a clean, patched baseline.
+# Disable with: -e gcompris_rpi_kiosk_update_system=false
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  when: gcompris_rpi_kiosk_update_system | bool
+
+- name: Upgrade all packages (dist-upgrade)
+  ansible.builtin.apt:
+    upgrade: dist
+  when: gcompris_rpi_kiosk_update_system | bool
 
 # ── Task 1: Create Required Directories ──────────────────────────
 - name: Ensure target directories exist on the host
