@@ -40,10 +40,15 @@ cd ansible-role-gcompris
 ### Quick Start
 
 ```bash
-# 1. Edit inventory with your Pi's IP
-#    inventory.yml → change ansible_host to your Pi's address
+# 1. Edit inventory with your Pi's IP address and credentials
+#    inventory.yml → change ansible_host, ansible_user,
+#    ansible_password, and ansible_become_pass
 
-# 2. Run the playbook
+# 2. (Optional) Set up SSH key auth instead of password:
+#    ssh-copy-id pi@192.168.1.100
+#    (then remove ansible_password from inventory)
+
+# 3. Run the playbook
 ansible-playbook -i inventory.yml playbooks/provision.yml
 ```
 
@@ -186,7 +191,7 @@ The GitHub Actions pipeline runs on every push/PR:
 - **Age filtering** is the third layer — ensures age-appropriate content
 - **Air-gap mode** is the fourth layer — complete physical network isolation
 - All four layers work together; none alone is sufficient for unattended deployment
-- **Inventory passwords** — the example `inventory.yml` contains a placeholder password. For real deployments, use `ansible-vault` to encrypt secrets or configure SSH key-based authentication instead of `ansible_become_pass`
+- **Inventory passwords** — the example `inventory.yml` contains placeholder values for both `ansible_password` (SSH login) and `ansible_become_pass` (sudo). For real deployments, use `ansible-vault` to encrypt the inventory file or configure SSH key-based authentication via `ssh-copy-id` and remove both password fields
 
 ## License
 

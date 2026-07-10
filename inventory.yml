@@ -9,6 +9,18 @@
 #   ansible-playbook -i inventory.yml playbooks/provision.yml \
 #     -e gcompris_rpi_kiosk_network_mode=none \
 #     -e gcompris_rpi_kiosk_min_age_level=2
+#
+# ── Authentication ────────────────────────────────────────────────
+# ansible_password: SSH login password (requires sshpass on the
+#   control machine, or use SSH keys via ssh-copy-id instead)
+# ansible_become_pass: sudo privilege escalation password
+#
+# For production, use ansible-vault to encrypt passwords:
+#   ansible-vault encrypt inventory.yml
+#
+# Or use SSH key-based auth (recommended):
+#   ssh-copy-id pi@192.168.1.100
+#   (then remove ansible_password from inventory)
 
 all:
   children:
@@ -17,6 +29,7 @@ all:
         kiosk-pi:
           ansible_host: 192.168.1.100
           ansible_user: pi
+          ansible_password: your_password
           ansible_become_pass: your_password
           gcompris_rpi_kiosk_network_mode: internal
           gcompris_rpi_kiosk_mode: true
