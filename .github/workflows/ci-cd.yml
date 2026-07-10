@@ -16,13 +16,13 @@ on:
   push:
     branches: [main]
     paths:
-      - "roles/gcompris_rpi_kiosk/**"
+      - "roles/arebach/gcompris_rpi_kiosk/**"
       - ".github/workflows/**"
       - "galaxy.yml"
   pull_request:
     branches: [main]
     paths:
-      - "roles/gcompris_rpi_kiosk/**"
+      - "roles/arebach/gcompris_rpi_kiosk/**"
       - ".github/workflows/**"
       - "galaxy.yml"
 
@@ -103,4 +103,4 @@ jobs:
         uses: ansible/ansible-galaxy-action@v1
         with:
           galaxy_api_key: ${{ secrets.GALAXY_API_KEY }}
-          role_path: roles/gcompris_rpi_kiosk
+          role_path: roles/arebach/gcompris_rpi_kiosk

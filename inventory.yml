@@ -10,7 +10,6 @@
 #     -e gcompris_network_mode=none \
 #     -e gcompris_min_age_level=2
 
----
 all:
   children:
     gcompris_kiosks:

@@ -32,9 +32,10 @@
 
 # ── Screen Blanking ───────────────────────────────────────────────
 # Applies DPMS / screen blanking settings immediately based on the
-# configured timeout value.
+# configured timeout value. Requires an active X display.
 - name: Apply DPMS settings
   ansible.builtin.shell: |
+    export DISPLAY=:0
     if [ "{{ gcompris_screen_timeout_minutes | int }}" -eq 0 ]; then
       xset s off
       xset -dpms
@@ -47,3 +48,4 @@
   args:
     executable: /bin/bash
   changed_when: true
+  ignore_errors: true  # May fail if no X display is active during provisioning

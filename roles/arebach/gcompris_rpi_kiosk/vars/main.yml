@@ -18,8 +18,8 @@ gcompris_packages:
   - tslib
   # Screen blanking prevention
   - xscreensaver
-  # HDMI override utilities
-  - tvservice
+  # HDMI override utilities (tvservice is part of libraspberrypi-bin)
+  - libraspberrypi-bin
   # Network filtering (for "internal" mode)
   - iptables
   - ufw

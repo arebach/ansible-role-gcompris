@@ -31,8 +31,8 @@
   ansible.builtin.ufw:
     rule: "{{ item.rule }}"
     from_addr: "{{ item.from }}"
-    from_port: "{{ item.port }}"
-    to_port: "{{ gcompris_allowed_internal_ports | join(',') }}"
+    to_port: "{{ item.port }}"
+  loop:
   loop:
     # Allow DNS for internal DNS servers (10.x, 172.x, 192.168.x)
     - { rule: "allow", from: "10.0.0.0/8", port: "53" }
@@ -64,42 +64,27 @@
     cmd: "ufw --force enable"
   changed_when: true
 
-- name: Block outbound internet traffic (only allow internal ranges)
+- name: Block outbound internet traffic (DROP non-RFC1918 on web ports)
   ansible.builtin.iptables:
     chain: OUTPUT
-    destination: "{{ item }}"
+    destination: "{{ item.dest }}"
+    protocol: "{{ item.proto }}"
+    destination_port: "{{ item.port }}"
     jump: DROP
   loop:
-    - "10.0.0.0/8"
-    - "172.16.0.0/12"
-    - "192.168.0.0/16"
-  # NOTE: This is a permissive allowlist approach — all outbound
-  # traffic to non-RFC1918 addresses is implicitly allowed by
-  # UFW's default outgoing=allow. To truly block internet, we add
-  # a DROP rule BEFORE the accept rules.
+    - { dest: "0.0.0.0/0", proto: "tcp", port: "80" }
+    - { dest: "0.0.0.0/0", proto: "tcp", port: "443" }
+    - { dest: "0.0.0.0/0", proto: "udp", port: "53" }
+  # NOTE: These rules block outbound HTTP/HTTPS/DNS to ALL addresses.
+  # UFW rules above already allowed these ports for RFC1918 ranges,
+  # so internal traffic flows; internet traffic is dropped here.
+  # iptables processes UFW rules first, then these as a catch-all.
 
-- name: Deploy restrictive iptables rules for internal-only mode
-  ansible.builtin.copy:
-    content: |
-      #!/bin/sh
-      # GCompris Kiosk — Internal-only network filter
-      # Blocks all outbound traffic except to RFC1918 private ranges.
-      # Deployed to /etc/ufw/before.rules by the UFW "before" hook.
-      
-      *filter
-      :OUTPUT [ACCEPT]
-      
-      # Drop outbound to internet (non-private) on sensitive ports
-      -A OUTPUT -p tcp --dport 80 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
-      -A OUTPUT -p tcp --dport 443 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
-      -A OUTPUT -p udp --dport 53 -d 0.0.0.0/0 ! -d 10.0.0.0/8 ! -d 172.16.0.0/12 ! -d 192.168.0.0/16 -j DROP
-      
-      COMMIT
-    dest: "/etc/ufw/user.rules.d/gcompris-internal.conf"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  notify: Reload UFW Firewall
+- name: Allow established internal connections
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    ctstate: "ESTABLISHED,RELATED"
+    jump: ACCEPT
 
 - name: Disable Bluetooth (reduce wireless attack surface)
   ansible.builtin.systemd:

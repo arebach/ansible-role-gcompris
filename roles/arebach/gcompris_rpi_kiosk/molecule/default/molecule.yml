@@ -7,8 +7,6 @@
 dependency:
   name: galaxy
   options:
-    role-file: galaxy.yml
-    requirements-file: requirements.yml
     ignore-errors: true
 
 driver:
@@ -32,9 +30,6 @@ platforms:
 
 provisioner:
   name: ansible
-  inventory:
-    links:
-      group_vars: group_vars
   playbooks:
     verify: ../default/verify.yml
 

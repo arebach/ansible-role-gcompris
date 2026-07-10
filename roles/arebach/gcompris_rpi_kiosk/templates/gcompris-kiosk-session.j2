@@ -1,46 +1,36 @@
 #!/usr/bin/env bash
 # GCompris RPi Kiosk — GCompris Kiosk Session Wrapper
 # =====================================================
-# This script replaces GCompris's native .desktop entry to launch it
-# in kiosk mode with the correct flags, age filtering, and cleanup.
+# This script launches GCompris in kiosk mode with the correct flags,
+# age filtering, and security lockdown configured by the Ansible role.
 #
-# Deployed to: /usr/share/xsessions/gcompris-kiosk.desktop
-# (symlinked from templates/gcompris-kiosk.desktop.j2)
+# Deployed to: /usr/local/bin/gcompris-kiosk-session.sh
 #
-# Kiosk flags used:
+# GCompris Qt CLI flags used (per gcompris-configuration.md):
 #   --fullscreen          Force fullscreen, no window decorations
-#   --no-tray             Hide the system tray (no exit button visible)
-#   --hide-ui             Minimal UI — no settings accessible
-#   --age-level=MIN:MAX   Restrict activities to the specified range
-#   --no-update           Disable automatic content updates (air-gapped)
+#   --enable-kioskmode    Hide Quit and Configuration buttons
+#   --difficulty min-max Restrict activities to difficulty range (1-6)
+#   --nocursor            Disable cursor for touchscreen displays
 #
 # ── Exit Prevention ───────────────────────────────────────────────
-# GCompris has no built-in "cannot exit" mode, so we wrap it in a
-# custom .desktop that also patches the source to suppress the
-# "quit" menu item.  For robustness, we also set X11 DontZap /
-# DontVTSwitch flags so VT switching and X kill are disabled.
-#
-# If a child somehow closes GCompris, this script re-launches it
-# automatically (the session restarts via the .desktop).
+# GCompris kiosk mode hides the Quit button. X11 DontZap / DontVTSwitch
+# flags prevent VT switching and X kill. If GCompris exits, LightDM
+# will respawn the session via the .desktop autologin.
 
 set -euo pipefail
 
 # ── Build command line ──────────────────────────────────────────
-CMD="gcompris"
+CMD="gcompris --fullscreen --enable-kioskmode"
 
-CMD="${CMD} --fullscreen"
-CMD="${CMD} --no-tray"
-CMD="${CMD} --hide-ui"
+# Difficulty filtering (GCompris uses 1-6 scale, not 0-9)
+{% if gcompris_min_age_level | int > 0 or gcompris_max_age_level | int < 9 %}
+CMD="${CMD} --difficulty {{ gcompris_min_age_level | int + 1 }}-{{ gcompris_max_age_level | int + 1 }}"
+{% endif %}
 
-# Age-level restriction
-if [[ "${GCOMPRIS_MIN_AGE:-0}" -gt 0 ]] || [[ "${GCOMPRIS_MAX_AGE:-9}" -lt 9 ]]; then
-    CMD="${CMD} --age-level=${GCOMPRIS_MIN_AGE}:${GCOMPRIS_MAX_AGE}"
-fi
-
-# Disable updates for offline / air-gapped mode
-if [[ "${GCOMPRIS_NETWORK_MODE:-full}" == "none" ]]; then
-    CMD="${CMD} --no-update"
-fi
+# Touchscreen: disable cursor
+{% if gcompris_enable_touchscreen | bool %}
+CMD="${CMD} --nocursor"
+{% endif %}
 
 # ── Launch ──────────────────────────────────────────────────────
 exec ${CMD}
