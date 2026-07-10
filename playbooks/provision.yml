@@ -27,4 +27,4 @@
   vars_files:
     - "../vars/deployment.yml"
   roles:
-    - role: "{{ playbook_dir }}/../roles/arebach/gcompris_rpi_kiosk"
+    - role: "{{ playbook_dir }}/../roles/arebach/gcompris_rpi_kiosk"  # noqa: role-name[path]

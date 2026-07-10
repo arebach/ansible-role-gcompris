@@ -85,6 +85,8 @@
   ansible.builtin.user:
     name: "{{ gcompris_rpi_kiosk_user }}"
     group: "{{ gcompris_rpi_kiosk_group }}"
+    groups: "video,input,tty,audio,plugdev"
+    append: true
     shell: "/bin/bash"
     create_home: true
     state: "present"
@@ -148,6 +150,22 @@
     group: "root"
     mode: "0644"
   notify: Restart LightDM Service
+
+# ── Task 10b: Ensure LightDM is the Default Display Manager ──────
+- name: Set LightDM as the default display manager
+  ansible.builtin.copy:
+    content: "/usr/sbin/lightdm\n"
+    dest: "/etc/X11/default-display-manager"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: Restart LightDM Service
+
+# ── Task 10c: Ensure LightDM Service is Enabled on Boot ──────────
+- name: Enable LightDM display manager service
+  ansible.builtin.systemd:
+    name: "lightdm"
+    enabled: true
 
 # ── Task 11: Clear LightDM Session Cache (Kiosk Mode Only) ───────
 - name: Remove cached session configuration to prevent override

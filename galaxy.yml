@@ -22,5 +22,7 @@ tags:
   - lightdm
   - touchscreen
   - agerestricted
+  - linux
+repository: https://github.com/arebach/ansible-role-gcompris
 homepage: https://github.com/arebach/ansible-role-gcompris
 issues: https://github.com/arebach/ansible-role-gcompris/issues

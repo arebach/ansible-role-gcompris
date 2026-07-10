@@ -1,0 +1,5 @@
+---
+# Ansible Galaxy runtime requirements (collection-level)
+# https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html#runtime-yml
+
+requires_ansible: ">=2.15.0"
