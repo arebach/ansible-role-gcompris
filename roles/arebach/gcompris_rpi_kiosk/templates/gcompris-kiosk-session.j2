@@ -16,8 +16,20 @@
 # GCompris kiosk mode hides the Quit button. X11 DontZap / DontVTSwitch
 # flags prevent VT switching and X kill. If GCompris exits, LightDM
 # will respawn the session via the .desktop autologin.
+#
+# ── Maintenance Exit ──────────────────────────────────────────────
+# When gcompris_rpi_kiosk_block_zap is false (default), Ctrl+Alt+Backspace
+# terminates the X server and returns to the LightDM greeter. This
+# requires the XKB option 'terminate:ctrl_alt_bksp' to be enabled, which
+# modern Xorg does NOT enable by default (DontZap=False alone is not enough).
 
 set -euo pipefail
+
+# ── Enable Ctrl+Alt+Backspace (if not blocked) ──────────────────
+{% if not gcompris_rpi_kiosk_block_zap | bool %}
+# Enable XKB terminate sequence so Ctrl+Alt+Backspace kills the X server
+setxkbmap -option terminate:ctrl_alt_bksp || true
+{% endif %}
 
 # ── Build command line ──────────────────────────────────────────
 CMD="gcompris-qt --fullscreen --enable-kioskmode"
