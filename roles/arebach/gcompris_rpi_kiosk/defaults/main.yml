@@ -5,7 +5,7 @@
 #
 # ── GCompris Version ──────────────────────────────────────────────
 # Default: latest from Debian repos
-gcompris_version: ""
+gcompris_rpi_kiosk_version: ""
 
 # ── Kiosk Mode ────────────────────────────────────────────────────
 # When enabled, the system runs as a single-purpose kiosk with:
@@ -17,7 +17,7 @@ gcompris_version: ""
 #   - All user desktops replaced by GCompris
 #
 # Set to false to run GCompris as a normal application.
-gcompris_kiosk_mode: yes
+gcompris_rpi_kiosk_mode: true
 
 # ── Network Restriction Mode ──────────────────────────────────────
 # Controls network access at the OS level after provisioning:
@@ -31,49 +31,49 @@ gcompris_kiosk_mode: yes
 #   "none"      — Air-gapped. All network services stopped and disabled.
 #                 No network access whatsoever.
 #
-gcompris_network_mode: "internal"
+gcompris_rpi_kiosk_network_mode: "internal"
 
 # ── Kiosk User ─────────────────────────────────────────────────────
 # Dedicated system user for the kiosk session
-gcompris_kiosk_user: "kiosk"
-gcompris_kiosk_group: "kiosk"
+gcompris_rpi_kiosk_user: "kiosk"
+gcompris_rpi_kiosk_group: "kiosk"
 
 # ── Local Package Staging ──────────────────────────────────────────
 # Directory where offline packages are staged on the target
-gcompris_local_pkg_dir: "/var/cache/gcompris_pkg"
+gcompris_rpi_kiosk_local_pkg_dir: "/var/cache/gcompris_rpi_kiosk_pkg"
 
 # ── Display Server ─────────────────────────────────────────────────
 # Force X11 mode (required — Raspberry Pi OS Bookworm defaults to Wayland)
-gcompris_force_x11: true
+gcompris_rpi_kiosk_force_x11: true
 
 # ── LightDM Autologin ──────────────────────────────────────────────
 # Timeout before auto-login (0 = immediate)
-gcompris_autologin_timeout: 0
+gcompris_rpi_kiosk_autologin_timeout: 0
 
 # ── Age Restriction ────────────────────────────────────────────────
 # Minimum age level (0-9) for activity filtering inside GCompris.
 # Maps to GCompris difficulty 1-6 (level+1, clamped to 1-6 max).
 # Levels 0-5 map directly to difficulties 1-6; levels 6-9 are clamped to 6.
-gcompris_min_age_level: 0
+gcompris_rpi_kiosk_min_age_level: 0
 
 # ── Maximum Age Level ──────────────────────────────────────────────
 # Maximum age level (0-9) for activity filtering.
 # Set below 9 to lock out advanced activities.
 # Default 9 = all activities unlocked (no --difficulty flag passed).
 # Levels 6-9 are clamped to difficulty 6 (GCompris maximum).
-gcompris_max_age_level: 9
+gcompris_rpi_kiosk_max_age_level: 9
 
 # ── Screen Timeout / Saver ────────────────────────────────────────
 # Screen blank timeout in minutes. Set to 0 to disable screen blanking
 # entirely (display always on). Default: 15 minutes.
-gcompris_screen_timeout_minutes: 15
+gcompris_rpi_kiosk_screen_timeout_minutes: 15
 
 # ── Touchscreen Calibration ────────────────────────────────────────
 # Enable tslib for capacitive touchscreens (e.g., official RPi touch
 # display or third-party HDMI touch panels)
-gcompris_enable_touchscreen: false
+gcompris_rpi_kiosk_enable_touchscreen: false
 
 # ── HDMI Output Force ──────────────────────────────────────────────
 # Force HDMI output even if no display is detected (useful for
 # first-time headless setup or stubborn displays)
-gcompris_force_hdmi: false
+gcompris_rpi_kiosk_force_hdmi: false

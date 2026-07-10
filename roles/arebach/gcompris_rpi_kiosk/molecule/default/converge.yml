@@ -9,6 +9,6 @@
   hosts: all
   become: true
   vars:
-    gcompris_network_mode: "internal"
+    gcompris_rpi_kiosk_network_mode: "internal"
   roles:
-    - role: "{{ playbook_dir }}/../.."
+    - role: "{{ playbook_dir }}/../.."  # noqa: role-name[path]

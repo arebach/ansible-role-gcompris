@@ -1,13 +1,13 @@
 # GCompris Kiosk — Network: None (Air-Gapped) Mode
 # ===================================================
-# gcompris_network_mode: none
+# gcompris_rpi_kiosk_network_mode: none
 #
 # Complete air-gap: all network services stopped and disabled.
 # This is the maximum security posture — suitable for devices
 # in classrooms or public areas where any network access would
 # violate policy.
 #
-# Services disabled (from gcompris_network_services):
+# Services disabled (from gcompris_rpi_kiosk_network_services):
 #   - WPA Supplicant (Wi-Fi)
 #   - NetworkManager (Wi-Fi/Ethernet management)
 #   - dhcpcd (DHCP client)
@@ -22,15 +22,15 @@
     name: "{{ item }}"
     state: "stopped"
     enabled: false
-  loop: "{{ gcompris_network_services }}"
-  ignore_errors: true  # Some services may not exist on minimal installs
+  loop: "{{ gcompris_rpi_kiosk_network_services }}"
+  failed_when: false
 
 - name: Mask network services to prevent restart
   ansible.builtin.systemd:
     name: "{{ item }}"
     masked: true
-  loop: "{{ gcompris_network_services }}"
-  ignore_errors: true
+  loop: "{{ gcompris_rpi_kiosk_network_services }}"
+  failed_when: false
 
 - name: Disable USB networking (prevent Ethernet via USB adapter)
   ansible.builtin.lineinfile:
@@ -38,7 +38,7 @@
     line: "install usbnet /bin/true"
     create: true
     mode: "0644"
-  ignore_errors: true
+  failed_when: false
 
 - name: Deploy air-gapped status indicator
   ansible.builtin.copy:
@@ -50,4 +50,4 @@
     owner: "root"
     group: "root"
     mode: "0755"
-  ignore_errors: true
+  failed_when: false

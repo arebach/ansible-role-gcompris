@@ -7,8 +7,8 @@
 #
 # To customize variables:
 #   ansible-playbook -i inventory.yml playbooks/provision.yml \
-#     -e gcompris_network_mode=none \
-#     -e gcompris_min_age_level=2
+#     -e gcompris_rpi_kiosk_network_mode=none \
+#     -e gcompris_rpi_kiosk_min_age_level=2
 
 all:
   children:
@@ -18,7 +18,7 @@ all:
           ansible_host: 192.168.1.100
           ansible_user: pi
           ansible_become_pass: your_password
-          gcompris_network_mode: internal
-          gcompris_kiosk_mode: yes
-          gcompris_min_age_level: 0
-          gcompris_max_age_level: 5
+          gcompris_rpi_kiosk_network_mode: internal
+          gcompris_rpi_kiosk_mode: yes
+          gcompris_rpi_kiosk_min_age_level: 0
+          gcompris_rpi_kiosk_max_age_level: 5

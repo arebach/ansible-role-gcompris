@@ -12,15 +12,15 @@ license:
   - MIT
 tags:
   - gcompris
-  - raspberry-pi
+  - raspberrypi
   - kiosk
   - children
   - educational
-  - air-gapped
+  - airgapped
   - bookworm
   - x11
   - lightdm
   - touchscreen
-  - age-restricted
+  - agerestricted
 homepage: https://github.com/arebach/ansible-role-gcompris
 issues: https://github.com/arebach/ansible-role-gcompris/issues

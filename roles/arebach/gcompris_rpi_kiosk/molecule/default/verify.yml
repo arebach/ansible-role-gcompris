@@ -11,146 +11,146 @@
     # ── Package staging directory ──────────────────────────────────
     - name: Check package staging directory exists
       ansible.builtin.stat:
-        path: "{{ gcompris_local_pkg_dir }}"
-      register: pkg_dir_check
+        path: "{{ gcompris_rpi_kiosk_local_pkg_dir }}"
+      register: gcompris_rpi_kiosk_pkg_dir_check
 
     - name: Verify package staging directory exists
       ansible.builtin.assert:
         that:
-          - "pkg_dir_check.stat.exists"
+          - "gcompris_rpi_kiosk_pkg_dir_check.stat.exists"
         fail_msg: "Package staging directory not found."
 
     # ── LightDM autologin ───────────────────────────────────────────
     - name: Check LightDM autologin configuration exists
       ansible.builtin.stat:
         path: "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
-      register: autologin_conf
+      register: gcompris_rpi_kiosk_autologin_conf
 
     - name: Verify LightDM autologin configuration exists
       ansible.builtin.assert:
         that:
-          - "autologin_conf.stat.exists"
+          - "gcompris_rpi_kiosk_autologin_conf.stat.exists"
         fail_msg: "LightDM autologin configuration not found."
 
     - name: Read LightDM autologin configuration
       ansible.builtin.command:
         cmd: "cat /etc/lightdm/lightdm.conf.d/10-autologin.conf"
-      register: autologin_content
+      register: gcompris_rpi_kiosk_autologin_content
       changed_when: false
 
     - name: Verify LightDM autologin user is set correctly
       ansible.builtin.assert:
         that:
-          - "'autologin-user={{ gcompris_kiosk_user }}' in autologin_content.stdout"
+          - "'autologin-user={{ gcompris_rpi_kiosk_user }}' in gcompris_rpi_kiosk_autologin_content.stdout"
         fail_msg: "LightDM autologin configuration has incorrect user."
 
     # ── Kiosk session .desktop ───────────────────────────────────────
     - name: Check kiosk session .desktop file exists
       ansible.builtin.stat:
         path: "/usr/share/xsessions/gcompris-kiosk.desktop"
-      register: session_desktop
+      register: gcompris_rpi_kiosk_session_desktop
 
     - name: Verify kiosk session .desktop file exists
       ansible.builtin.assert:
         that:
-          - "session_desktop.stat.exists"
+          - "gcompris_rpi_kiosk_session_desktop.stat.exists"
         fail_msg: "GCompris kiosk session .desktop file not found."
 
     # ── Kiosk session wrapper script ────────────────────────────────
     - name: Check kiosk session wrapper script exists
       ansible.builtin.stat:
         path: "/usr/local/bin/gcompris-kiosk-session.sh"
-      register: session_script
+      register: gcompris_rpi_kiosk_session_script
 
     - name: Verify kiosk session wrapper script exists
       ansible.builtin.assert:
         that:
-          - "session_script.stat.exists"
+          - "gcompris_rpi_kiosk_session_script.stat.exists"
         fail_msg: "GCompris kiosk session wrapper script not found."
 
     # ── X11 kiosk configuration (kiosk mode only) ──────────────────
     - name: Check X11 kiosk configuration exists
       ansible.builtin.stat:
         path: "/etc/X11/xorg.conf.d/10-kiosk.conf"
-      register: xorg_conf
-      when: gcompris_kiosk_mode | bool
+      register: gcompris_rpi_kiosk_xorg_conf
+      when: gcompris_rpi_kiosk_mode | bool
 
     - name: Verify X11 kiosk configuration exists
       ansible.builtin.assert:
         that:
-          - "xorg_conf.stat.exists"
+          - "gcompris_rpi_kiosk_xorg_conf.stat.exists"
         fail_msg: "X11 kiosk configuration not found."
-      when: gcompris_kiosk_mode | bool
+      when: gcompris_rpi_kiosk_mode | bool
 
     - name: Read X11 kiosk configuration
       ansible.builtin.command:
         cmd: "cat /etc/X11/xorg.conf.d/10-kiosk.conf"
-      register: xorg_content
+      register: gcompris_rpi_kiosk_xorg_content
       changed_when: false
-      when: gcompris_kiosk_mode | bool
+      when: gcompris_rpi_kiosk_mode | bool
 
     - name: Verify X11 configuration content (DontVTSwitch and DontZap)
       ansible.builtin.assert:
         that:
-          - "'DontVTSwitch' in xorg_content.stdout"
-          - "'DontZap' in xorg_content.stdout"
+          - "'DontVTSwitch' in gcompris_rpi_kiosk_xorg_content.stdout"
+          - "'DontZap' in gcompris_rpi_kiosk_xorg_content.stdout"
         fail_msg: "X11 kiosk configuration has incorrect content."
-      when: gcompris_kiosk_mode | bool
+      when: gcompris_rpi_kiosk_mode | bool
 
     # ── logind configuration (kiosk mode only) ─────────────────────
     - name: Check logind configuration exists
       ansible.builtin.stat:
         path: "/etc/systemd/logind.conf.d/novt.conf"
-      register: novt_conf
-      when: gcompris_kiosk_mode | bool
+      register: gcompris_rpi_kiosk_novt_conf
+      when: gcompris_rpi_kiosk_mode | bool
 
     - name: Verify logind configuration exists
       ansible.builtin.assert:
         that:
-          - "novt_conf.stat.exists"
+          - "gcompris_rpi_kiosk_novt_conf.stat.exists"
         fail_msg: "Logind configuration not found."
-      when: gcompris_kiosk_mode | bool
+      when: gcompris_rpi_kiosk_mode | bool
 
     # ── Getty masking (kiosk mode only) ────────────────────────────
     - name: Check getty@tty1 is masked
       ansible.builtin.stat:
         path: "/etc/systemd/system/getty@tty1.service"
-      register: getty_link
-      when: gcompris_kiosk_mode | bool
+      register: gcompris_rpi_kiosk_getty_link
+      when: gcompris_rpi_kiosk_mode | bool
 
     - name: Verify getty@tty1 is masked
       ansible.builtin.assert:
         that:
-          - "getty_link.stat.islnk"
-          - "getty_link.stat.lnk_target == '/dev/null'"
+          - "gcompris_rpi_kiosk_getty_link.stat.islnk"
+          - "gcompris_rpi_kiosk_getty_link.stat.lnk_target == '/dev/null'"
         fail_msg: "Getty on tty1 is not properly masked."
-      when: gcompris_kiosk_mode | bool
+      when: gcompris_rpi_kiosk_mode | bool
 
     # ── GCompris package installation ──────────────────────────────
     - name: Check GCompris package is installed
       ansible.builtin.command:
         cmd: "dpkg -l gcompris-qt"
-      register: gcompris_pkg
+      register: gcompris_rpi_kiosk_pkg
       changed_when: false
       failed_when: false
 
     - name: Verify GCompris package is installed
       ansible.builtin.assert:
         that:
-          - "gcompris_pkg.rc == 0"
-          - "'not installed' not in gcompris_pkg.stdout"
+          - "gcompris_rpi_kiosk_pkg.rc == 0"
+          - "'not installed' not in gcompris_rpi_kiosk_pkg.stdout"
         fail_msg: "GCompris-Qt package is not installed."
 
     # ── Network status indicator (internal and none modes) ─────────
     - name: Check network status indicator exists
       ansible.builtin.stat:
         path: "/usr/local/bin/gcompris-network-status.sh"
-      register: net_status
-      when: gcompris_network_mode == 'internal' or gcompris_network_mode == 'none'
+      register: gcompris_rpi_kiosk_net_status
+      when: gcompris_rpi_kiosk_network_mode == 'internal' or gcompris_rpi_kiosk_network_mode == 'none'
 
     - name: Verify network status indicator exists
       ansible.builtin.assert:
         that:
-          - "net_status.stat.exists"
+          - "gcompris_rpi_kiosk_net_status.stat.exists"
         fail_msg: "Network status indicator not found."
-      when: gcompris_network_mode == 'internal' or gcompris_network_mode == 'none'
+      when: gcompris_rpi_kiosk_network_mode == 'internal' or gcompris_rpi_kiosk_network_mode == 'none'

@@ -1,6 +1,6 @@
 # GCompris Kiosk — Network: Internal-Only Mode
 # ================================================
-# gcompris_network_mode: internal
+# gcompris_rpi_kiosk_network_mode: internal
 #
 # Network stack remains active but internet is blocked.
 # Only RFC1918 private ranges are allowed on common ports.
@@ -19,19 +19,21 @@
     state: "present"
     update_cache: true
 
-- name: Set UFW default policies (deny incoming, deny outgoing)
+- name: Set UFW default policy — deny incoming
   community.general.ufw:
-    direction: "{{ item.direction }}"
-    policy: "{{ item.policy }}"
-  loop:
-    - { direction: "incoming", policy: "deny" }
-    - { direction: "outgoing", policy: "deny" }
+    direction: "incoming"
+    policy: "deny"
+
+- name: Set UFW default policy — deny outgoing
+  community.general.ufw:
+    direction: "outgoing"
+    policy: "deny"
 
 - name: Allow outbound DNS to internal servers
   community.general.ufw:
     rule: "allow"
     direction: "out"
-    to_addr: "{{ item.net }}"
+    to_ip: "{{ item.net }}"
     to_port: "53"
     proto: "any"
   loop:
@@ -43,7 +45,7 @@
   community.general.ufw:
     rule: "allow"
     direction: "out"
-    to_addr: "{{ item.net }}"
+    to_ip: "{{ item.net }}"
     to_port: "67"
     proto: "any"
   loop:
@@ -55,7 +57,7 @@
   community.general.ufw:
     rule: "allow"
     direction: "out"
-    to_addr: "{{ item.net }}"
+    to_ip: "{{ item.net }}"
     to_port: "22"
     proto: "tcp"
   loop:
@@ -67,7 +69,7 @@
   community.general.ufw:
     rule: "allow"
     direction: "out"
-    to_addr: "{{ item.net }}"
+    to_ip: "{{ item.net }}"
     to_port: "{{ item.port }}"
     proto: "tcp"
   loop:
@@ -82,7 +84,7 @@
   community.general.ufw:
     rule: "allow"
     direction: "out"
-    to_addr: "{{ item.net }}"
+    to_ip: "{{ item.net }}"
     to_port: "3389"
     proto: "tcp"
   loop:
@@ -94,7 +96,7 @@
   community.general.ufw:
     rule: "allow"
     direction: "in"
-    from_addr: "{{ item.net }}"
+    from_ip: "{{ item.net }}"
     to_port: "22"
     proto: "tcp"
   loop:
@@ -112,7 +114,7 @@
     name: "bluetooth.service"
     state: "stopped"
     enabled: false
-  ignore_errors: true
+  failed_when: false
 
 - name: Deploy network status indicator script
   ansible.builtin.copy:
@@ -124,4 +126,4 @@
     owner: "root"
     group: "root"
     mode: "0755"
-  ignore_errors: true
+  failed_when: false

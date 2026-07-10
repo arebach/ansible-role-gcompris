@@ -1,6 +1,6 @@
 # GCompris Kiosk — Network: Full Access Mode
 # =============================================
-# gcompris_network_mode: full
+# gcompris_rpi_kiosk_network_mode: full
 #
 # All network services remain active and enabled.
 # This is the least restrictive mode — allows internet

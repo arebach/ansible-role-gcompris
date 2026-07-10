@@ -29,16 +29,20 @@
 - name: Apply DPMS settings
   ansible.builtin.shell: |
     export DISPLAY=:0
-    if [ "{{ gcompris_screen_timeout_minutes | int }}" -eq 0 ]; then
+    if [ "{{ gcompris_rpi_kiosk_screen_timeout_minutes | int }}" -eq 0 ]; then
       xset s off
       xset -dpms
       xset s noblank
     else
-      xset s {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }}
-      xset dpms {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }} {{ gcompris_screen_timeout_minutes | int }}
+      xset s {{ gcompris_rpi_kiosk_screen_timeout_minutes | int }} \
+        {{ gcompris_rpi_kiosk_screen_timeout_minutes | int }}
+      xset dpms \
+        {{ gcompris_rpi_kiosk_screen_timeout_minutes | int }} \
+        {{ gcompris_rpi_kiosk_screen_timeout_minutes | int }} \
+        {{ gcompris_rpi_kiosk_screen_timeout_minutes | int }}
       xset s on
     fi
   args:
     executable: /bin/bash
   changed_when: true
-  ignore_errors: true  # May fail if no X display is active during provisioning
+  failed_when: false

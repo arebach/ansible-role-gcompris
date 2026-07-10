@@ -3,6 +3,7 @@
 # Ignore patterns for the Ansible Galaxy role repository.
 
 # ── Ansible/Molecule ─────────────────────────────────────────────
+.ansible/
 molecule/default/__pycache__/
 molecule/default/.molecule/
 molecule/default/certs/

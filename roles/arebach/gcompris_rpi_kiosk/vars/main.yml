@@ -6,7 +6,7 @@
 # ── Package Dependencies ──────────────────────────────────────────
 # Core packages required for kiosk operation and GCompris runtime.
 #
-gcompris_packages:
+gcompris_rpi_kiosk_packages:
   # GCompris main package (Qt version)
   - gcompris-qt
   # Fullscreen and kiosk support
@@ -24,7 +24,7 @@ gcompris_packages:
 
 # ── Network Services ──────────────────────────────────────────────
 # Services stopped/disabled in "none" (air-gapped) mode
-gcompris_network_services:
+gcompris_rpi_kiosk_network_services:
   - wpa_supplicant.service
   - NetworkManager.service
   - dhcpcd.service

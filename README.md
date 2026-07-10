@@ -52,33 +52,33 @@ ansible-playbook -i inventory.yml playbooks/provision.yml
 **Air-gapped kiosk for unsupervised use:**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_network_mode=none \
-  -e gcompris_kiosk_mode=yes
+  -e gcompris_rpi_kiosk_network_mode=none \
+  -e gcompris_rpi_kiosk_mode=yes
 ```
 
 **Internal-only with age filtering (classroom, ages 4–8):**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_network_mode=internal \
-  -e gcompris_min_age_level=2 \
-  -e gcompris_max_age_level=7
+  -e gcompris_rpi_kiosk_network_mode=internal \
+  -e gcompris_rpi_kiosk_min_age_level=2 \
+  -e gcompris_rpi_kiosk_max_age_level=7
 ```
 
 **Normal desktop with GCompris (not kiosk):**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_kiosk_mode=no
+  -e gcompris_rpi_kiosk_mode=no
 ```
 
 **With touchscreen support:**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_enable_touchscreen=yes
+  -e gcompris_rpi_kiosk_enable_touchscreen=yes
 ```
 
 ## Variables Reference
 
-### Network Modes (`gcompris_network_mode`)
+### Network Modes (`gcompris_rpi_kiosk_network_mode`)
 
 | Value | Behavior | Use Case |
 |-------|----------|----------|
@@ -86,14 +86,14 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
 | `"internal"` | LAN only, internet blocked (default) | Classroom, library — safe default |
 | `"none"` | Air-gapped, no network | Public/unattended, maximum safety |
 
-### Kiosk Mode (`gcompris_kiosk_mode`)
+### Kiosk Mode (`gcompris_rpi_kiosk_mode`)
 
 | Value | Behavior |
 |-------|----------|
 | `yes` (default) | Full lockdown, autologin, auto-start GCompris |
 | `no` | Normal desktop, GCompris as regular app |
 
-### Age Filtering (`gcompris_min_age_level`, `gcompris_max_age_level`)
+### Age Filtering (`gcompris_rpi_kiosk_min_age_level`, `gcompris_rpi_kiosk_max_age_level`)
 
 GCompris has 10 age levels (0–9). Activities are filtered to the specified range:
 
@@ -111,10 +111,10 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `gcompris_force_x11` | `true` | Force X11 compositor (required for kiosk) |
-| `gcompris_force_hdmi` | `false` | Force HDMI output even if undetected |
-| `gcompris_enable_touchscreen` | `false` | Enable tslib for capacitive touch |
-| `gcompris_screen_timeout_minutes` | `15` | Screen blank timeout in minutes (0 = always on) |
+| `gcompris_rpi_kiosk_force_x11` | `true` | Force X11 compositor (required for kiosk) |
+| `gcompris_rpi_kiosk_force_hdmi` | `false` | Force HDMI output even if undetected |
+| `gcompris_rpi_kiosk_enable_touchscreen` | `false` | Enable tslib for capacitive touch |
+| `gcompris_rpi_kiosk_screen_timeout_minutes` | `15` | Screen blank timeout in minutes (0 = always on) |
 
 ## Network Modes in Detail
 

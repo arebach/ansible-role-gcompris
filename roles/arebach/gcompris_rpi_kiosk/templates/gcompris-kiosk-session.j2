@@ -24,15 +24,15 @@ CMD="gcompris-qt --fullscreen --enable-kioskmode"
 
 # Difficulty filtering (GCompris uses 1-6 scale; age_level 0-5 maps to 1-6)
 # Values above 5 are clamped to 6 (GCompris maximum difficulty).
-{% set min_diff = [1, gcompris_min_age_level | int + 1] | max %}
-{% set max_diff = [6, gcompris_max_age_level | int + 1] | min %}
+{% set min_diff = [1, gcompris_rpi_kiosk_min_age_level | int + 1] | max %}
+{% set max_diff = [6, gcompris_rpi_kiosk_max_age_level | int + 1] | min %}
 {% set min_diff = [min_diff, max_diff] | min %}
-{% if gcompris_min_age_level | int > 0 or gcompris_max_age_level | int < 9 %}
+{% if gcompris_rpi_kiosk_min_age_level | int > 0 or gcompris_rpi_kiosk_max_age_level | int < 9 %}
 CMD="${CMD} --difficulty {{ min_diff }}-{{ max_diff }}"
 {% endif %}
 
 # Touchscreen: disable cursor
-{% if gcompris_enable_touchscreen | bool %}
+{% if gcompris_rpi_kiosk_enable_touchscreen | bool %}
 CMD="${CMD} --nocursor"
 {% endif %}
 

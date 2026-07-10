@@ -10,7 +10,7 @@
 # When timeout is 0: screen blanking fully disabled (always on)
 # When timeout > 0: screen blanks after N minutes of inactivity
 
-{% if gcompris_screen_timeout_minutes | int == 0 %}
+{% if gcompris_rpi_kiosk_screen_timeout_minutes | int == 0 %}
 # Screen blanking disabled — display always on
 Section "ServerFlags"
     Option "DPMS" "false"
@@ -20,12 +20,12 @@ Section "ServerFlags"
     Option "OffTime" "0"
 EndSection
 {% else %}
-# Screen blanks after {{ gcompris_screen_timeout_minutes }} minutes of inactivity
+# Screen blanks after {{ gcompris_rpi_kiosk_screen_timeout_minutes }} minutes of inactivity
 Section "ServerFlags"
     Option "DPMS" "true"
-    Option "BlankTime" "{{ gcompris_screen_timeout_minutes }}"
-    Option "StandbyTime" "{{ gcompris_screen_timeout_minutes }}"
-    Option "SuspendTime" "{{ gcompris_screen_timeout_minutes }}"
-    Option "OffTime" "{{ gcompris_screen_timeout_minutes }}"
+    Option "BlankTime" "{{ gcompris_rpi_kiosk_screen_timeout_minutes }}"
+    Option "StandbyTime" "{{ gcompris_rpi_kiosk_screen_timeout_minutes }}"
+    Option "SuspendTime" "{{ gcompris_rpi_kiosk_screen_timeout_minutes }}"
+    Option "OffTime" "{{ gcompris_rpi_kiosk_screen_timeout_minutes }}"
 EndSection
 {% endif %}

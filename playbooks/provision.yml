@@ -7,9 +7,9 @@
 #
 # To customize, pass extra variables:
 #   ansible-playbook -i inventory.yml playbooks/provision.yml \
-#     -e gcompris_network_mode=none \
-#     -e gcompris_min_age_level=3 \
-#     -e gcompris_max_age_level=6
+#     -e gcompris_rpi_kiosk_network_mode=none \
+#     -e gcompris_rpi_kiosk_min_age_level=3 \
+#     -e gcompris_rpi_kiosk_max_age_level=6
 #
 # Network modes:
 #   "full"      — All network access (default: internal)
@@ -27,4 +27,4 @@
   vars_files:
     - "../vars/deployment.yml"
   roles:
-    - arebach.gcompris_rpi_kiosk
+    - role: "{{ playbook_dir }}/../roles/arebach/gcompris_rpi_kiosk"

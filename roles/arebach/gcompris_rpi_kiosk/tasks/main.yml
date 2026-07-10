@@ -3,18 +3,18 @@
 # Declarative, idempotent provisioning tasks for the GCompris kiosk
 # on Raspberry Pi.
 #
-# Kiosk mode (gcompris_kiosk_mode: yes) enables security lockdown:
+# Kiosk mode (gcompris_rpi_kiosk_mode: yes) enables security lockdown:
 #   - X11 server flags block VT switching and server termination
 #   - Getty service on tty1 is masked
 #   - logind configured to disable virtual terminals
 #   - Default desktop sessions replaced by GCompris kiosk
 #
-# Network modes (gcompris_network_mode):
+# Network modes (gcompris_rpi_kiosk_network_mode):
 #   "full"   — No restrictions (default: internal, not full)
 #   "internal" — Firewall allows only private RFC1918 ranges
 #   "none"     — Air-gapped; all network services stopped/disabled
 #
-# Age restriction (gcompris_min_age_level / gcompris_max_age_level):
+# Age restriction (gcompris_rpi_kiosk_min_age_level / gcompris_rpi_kiosk_max_age_level):
 #   Filters GCompris activities by developmental level (0-9).
 #   Lower numbers = activities for younger children.
 
@@ -28,7 +28,7 @@
     group: "root"
     mode: "0755"
   loop:
-    - "{{ gcompris_local_pkg_dir }}"
+    - "{{ gcompris_rpi_kiosk_local_pkg_dir }}"
     - "/etc/X11/xorg.conf.d"
     - "/etc/lightdm/lightdm.conf.d"
     - "/etc/systemd/logind.conf.d"
@@ -39,29 +39,30 @@
 - name: Force Raspberry Pi OS display compositor to X11 mode
   ansible.builtin.command:
     cmd: "raspi-config nonint do_wayland x11"
-  register: x11_switch_result
-  changed_when: x11_switch_result.rc == 0
-  when: gcompris_force_x11 | bool
+  register: gcompris_rpi_kiosk_x11_result
+  changed_when: gcompris_rpi_kiosk_x11_result.rc == 0
+  when: gcompris_rpi_kiosk_force_x11 | bool
   notify: Restart LightDM Service
 
 # ── Task 3: Force HDMI Output (Optional) ─────────────────────────
 - name: Force HDMI output even if no display detected
   ansible.builtin.command:
     cmd: "tvservice -e \"Group=DMT, Mode=82\""
-  when: gcompris_force_hdmi | bool
-  ignore_errors: true
+  when: gcompris_rpi_kiosk_force_hdmi | bool
+  changed_when: true
+  failed_when: false
 
 # ── Task 4: Create Kiosk System Group ────────────────────────────
 - name: Create dedicated system group for the kiosk user
   ansible.builtin.group:
-    name: "{{ gcompris_kiosk_group }}"
+    name: "{{ gcompris_rpi_kiosk_group }}"
     state: "present"
 
 # ── Task 5: Create Kiosk User Account ────────────────────────────
 - name: Create local user account for the kiosk session
   ansible.builtin.user:
-    name: "{{ gcompris_kiosk_user }}"
-    group: "{{ gcompris_kiosk_group }}"
+    name: "{{ gcompris_rpi_kiosk_user }}"
+    group: "{{ gcompris_rpi_kiosk_group }}"
     shell: "/bin/bash"
     create_home: true
     state: "present"
@@ -69,23 +70,23 @@
 # ── Task 6: Install GCompris Package ─────────────────────────────
 - name: Install GCompris from Debian repository
   ansible.builtin.apt:
-    name: "{{ gcompris_version | default('gcompris-qt', true) }}"
+    name: "{{ gcompris_rpi_kiosk_version | default('gcompris-qt', true) }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600
-  register: gcompris_install
+  register: gcompris_rpi_kiosk_install
   retries: 3
   delay: 10
-  ignore_errors: true
+  failed_when: false
 
 # ── Task 7: Install Additional Kiosk Packages ────────────────────
 - name: Install supporting kiosk packages
   ansible.builtin.apt:
-    name: "{{ gcompris_packages }}"
+    name: "{{ gcompris_rpi_kiosk_packages }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600
-  when: gcompris_install is not failed
+  when: gcompris_rpi_kiosk_install is not failed
 
 # ── Task 8: Deploy GCompris Kiosk Session Wrapper Script ─────────
 - name: Deploy the GCompris kiosk session wrapper script
@@ -122,9 +123,9 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - "/home/{{ gcompris_kiosk_user }}/.dmrc"
-  when: gcompris_kiosk_mode | bool
-  ignore_errors: true
+    - "/home/{{ gcompris_rpi_kiosk_user }}/.dmrc"
+  when: gcompris_rpi_kiosk_mode | bool
+  failed_when: false
 
 # ── Task 12: Remove Default Desktop Sessions (Kiosk Mode Only) ──
 - name: Remove default desktop session files to prevent selection
@@ -135,8 +136,8 @@
     - "/usr/share/xsessions/pixart.desktop"
     - "/usr/share/xsessions/rpidebian.desktop"
     - "/usr/share/xsessions/debian.desktop"
-  when: gcompris_kiosk_mode | bool
-  ignore_errors: true
+  when: gcompris_rpi_kiosk_mode | bool
+  failed_when: false
 
 # ── Task 13: Deploy X11 Security Server Flags (Kiosk Mode Only) ──
 - name: Apply X11 security flags to block console escape keys
@@ -146,7 +147,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: gcompris_kiosk_mode | bool
+  when: gcompris_rpi_kiosk_mode | bool
 
 # ── Task 14: Deploy logind Modifications (Kiosk Mode Only) ───────
 - name: Deploy logind configuration to disable virtual terminals
@@ -159,7 +160,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: gcompris_kiosk_mode | bool
+  when: gcompris_rpi_kiosk_mode | bool
   notify: Restart systemd-logind
 
 # ── Task 15: Mask Getty Service on TTY1 (Kiosk Mode Only) ────────
@@ -169,7 +170,7 @@
     state: "stopped"
     enabled: false
     masked: true
-  when: gcompris_kiosk_mode | bool
+  when: gcompris_rpi_kiosk_mode | bool
 
 # ── Task 16: Configure Screen Timeout (Kiosk Mode Only) ───────────
 - name: Configure screen blank timeout via Xorg DPMS and screensaver flags
@@ -179,7 +180,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: gcompris_kiosk_mode | bool
+  when: gcompris_rpi_kiosk_mode | bool
   notify:
     - Restart LightDM Service
     - Apply DPMS settings
@@ -197,7 +198,7 @@
       line: "hdmi_force_hotplug=1"
     - regexp: "^hdmi_blanking"
       line: "hdmi_blanking=1"
-  when: gcompris_kiosk_mode | bool
+  when: gcompris_rpi_kiosk_mode | bool
 
 # ── Task 18: Configure Touchscreen (If Enabled) ──────────────────
 - name: Deploy tslib calibration profile
@@ -214,13 +215,13 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: gcompris_enable_touchscreen | bool
+  when: gcompris_rpi_kiosk_enable_touchscreen | bool
   notify: Restart udev
 
 # ── Task 19: Configure Network Restrictions ──────────────────────
 # This task applies different network policies based on the
-# gcompris_network_mode variable.
+# gcompris_rpi_kiosk_network_mode variable.
 
 - name: Apply network restriction rules based on mode
-  ansible.builtin.include_tasks: "tasks/network-{{ gcompris_network_mode }}.yml"
-  when: gcompris_network_mode in ["full", "internal", "none"]
+  ansible.builtin.include_tasks: "tasks/network-{{ gcompris_rpi_kiosk_network_mode }}.yml"
+  when: gcompris_rpi_kiosk_network_mode in ["full", "internal", "none"]

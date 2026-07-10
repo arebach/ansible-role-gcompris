@@ -19,16 +19,13 @@ galaxy_info:
 
   galaxy_tags:
     - gcompris
-    - raspberry-pi
+    - raspberrypi
     - kiosk
     - children
     - educational
-    - air-gapped
+    - airgapped
     - bookworm
     - x11
     - lightdm
     - touchscreen
-    - age-restricted
-
-dependencies:
-  - community.general
+    - agerestricted
