@@ -1,0 +1,49 @@
+---
+name: Bug report
+about: Report a bug or unexpected behavior
+title: "[BUG] "
+labels: bug, needs-triage
+assignees: ""
+---
+
+## Describe the bug
+
+A clear and concise description of what the bug is.
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Run `ansible-playbook -i inventory.yml playbooks/provision.yml` with these variables:
+   ```yaml
+   # paste any variable overrides here
+   ```
+2. Observe the error at task: `...`
+
+## Expected behavior
+
+What you expected to happen.
+
+## Actual behavior
+
+What actually happened (error message, wrong state, etc.).
+
+## Environment
+
+- **Role version:** `1.2.0` (check `galaxy.yml`)
+- **Ansible version:** `ansible [core 2.x.x]` (run `ansible --version`)
+- **Target OS:** Raspberry Pi OS Bookworm (or specify other)
+- **Python version:** `3.x.x`
+- **Network mode:** `full` / `internal` / `none`
+
+## Logs
+
+```
+Paste relevant Ansible output or LightDM logs here.
+Use `ansible-playbook ... -vv` for verbose output.
+For boot issues, run: journalctl -u lightdm -b --no-pager
+```
+
+## Additional context
+
+Any other information about the problem (hardware specifics, custom configs, etc.).

@@ -1,0 +1,26 @@
+---
+name: Support question
+about: Ask for help or clarification about using the role
+title: "[SUPPORT] "
+labels: question
+assignees: ""
+---
+
+## What do you need help with?
+
+A clear description of your question or the problem you're facing.
+
+## What have you tried?
+
+List the steps you've already taken to solve this.
+
+## Environment
+
+- **Role version:** (check `galaxy.yml`)
+- **Ansible version:** (run `ansible --version`)
+- **Target OS:**
+- **Network mode:**
+
+## Additional context
+
+Any other information that might help.

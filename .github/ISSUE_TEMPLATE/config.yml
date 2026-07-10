@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GCompris documentation
+    url: https://gcompris.net/
+    about: Official GCompris website and documentation for the educational software itself
+  - name: Ansible Galaxy
+    url: https://galaxy.ansible.com/arebach/gcompris_rpi_kiosk
+    about: Install the role directly from Ansible Galaxy

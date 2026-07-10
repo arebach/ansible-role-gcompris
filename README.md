@@ -1,6 +1,12 @@
 # GCompris RPi Kiosk Ansible Role
 =================================
 
+[![CI/CD](https://github.com/arebach/ansible-role-gcompris/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/arebach/ansible-role-gcompris/actions/workflows/ci-cd.yml)
+[![Ansible Galaxy](https://img.shields.io/badge/galaxy-arebach.gcompris__rpi__kiosk-blue.svg)](https://galaxy.ansible.com/arebach/gcompris_rpi_kiosk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ansible-lint: production](https://img.shields.io/badge/ansible--lint-production-green.svg)](https://ansible-lint.com/)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 **Ansible Galaxy role for deploying a child-safe, locked-down GCompris kiosk on Raspberry Pi.**
 
 `ansible-galaxy install arebach.gcompris_rpi_kiosk`
@@ -189,7 +195,16 @@ All network services are stopped and disabled: Wi-Fi, Ethernet (via NetworkManag
 ansible-role-gcompris/
 ├── galaxy.yml                    # Galaxy metadata for publishing
 ├── CHANGELOG.md                 # Version history
-├── .github/workflows/ci-cd.yml   # Lint → Molecule → Galaxy pipeline
+├── CONTRIBUTING.md              # Contributor guidelines
+├── CODE_OF_CONDUCT.md           # Community code of conduct
+├── SECURITY.md                  # Security policy and reporting
+├── .github/
+│   ├── workflows/ci-cd.yml       # Lint → Molecule → Galaxy pipeline
+│   ├── ISSUE_TEMPLATE/           # Bug report, feature request, support templates
+│   ├── pull_request_template.md  # PR checklist template
+│   ├── dependabot.yml            # Automated GitHub Actions dependency updates
+│   ├── stale.yml                 # Auto-close stale issues/PRs
+│   └── FUNDING.yml               # Sponsorship configuration
 ├── playbooks/
 │   ├── provision.yml             # Example deployment playbook
 │   └── diagnostics.yml           # Boot-to-launch chain health check
@@ -238,6 +253,16 @@ The GitHub Actions pipeline runs on every push/PR:
 - All four layers work together; none alone is sufficient for unattended deployment
 - **Kiosk user password** — default is `"kiosk"`; change via `gcompris_rpi_kiosk_password` for production
 - **Inventory passwords** — the example `inventory.yml` contains placeholder values for both `ansible_password` (SSH login) and `ansible_become_pass` (sudo). For real deployments, use `ansible-vault` to encrypt the inventory file or configure SSH key-based authentication via `ssh-copy-id` and remove both password fields
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, testing requirements, and the pull request process.
+
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+Found a vulnerability? Please see [SECURITY.md](SECURITY.md) for responsible disclosure. **Do not open a public issue for security vulnerabilities.**
 
 ## License
 
