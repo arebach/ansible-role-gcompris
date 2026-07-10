@@ -10,5 +10,6 @@
   become: true
   vars:
     gcompris_rpi_kiosk_network_mode: "internal"
+    gcompris_rpi_kiosk_reboot: false  # never reboot inside Docker containers
   roles:
     - role: "{{ playbook_dir }}/../.."  # noqa: role-name[path]

@@ -81,3 +81,10 @@ gcompris_rpi_kiosk_enable_touchscreen: false
 # Force HDMI output even if no display is detected (useful for
 # first-time headless setup or stubborn displays)
 gcompris_rpi_kiosk_force_hdmi: false
+
+# ── Reboot After Provisioning ──────────────────────────────────────
+# Reboot the Pi at the end of the playbook so all changes (LightDM
+# autologin, X11 mode, kernel params, UFW rules) take effect.
+# Set to false to skip the reboot (e.g. for CI/CD or molecule tests):
+#   -e gcompris_rpi_kiosk_reboot=false
+gcompris_rpi_kiosk_reboot: true

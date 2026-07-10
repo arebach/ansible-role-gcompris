@@ -302,3 +302,13 @@
 - name: Apply network restriction rules based on mode
   ansible.builtin.include_tasks: "tasks/network-{{ gcompris_rpi_kiosk_network_mode }}.yml"
   when: gcompris_rpi_kiosk_network_mode in ["full", "internal", "none"]
+
+# ── Task 20: Reboot Kiosk Host ───────────────────────────────────
+# Reboots the Pi so all changes (LightDM autologin, X11 mode, kernel
+# params, UFW rules) take effect. Disable with:
+#   -e gcompris_rpi_kiosk_reboot=false
+- name: Reboot kiosk host to apply all changes
+  ansible.builtin.reboot:
+    reboot_timeout: 120
+    test_command: "systemctl is-active lightdm"
+  when: gcompris_rpi_kiosk_reboot | bool
