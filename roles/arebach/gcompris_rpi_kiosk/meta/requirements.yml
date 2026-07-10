@@ -1,7 +1,7 @@
 # GCompris RPi Kiosk Role — Collection Requirements
 # ====================================================
 # This role requires the community.general collection for the
-# ansible.posix.firewalld and community.general.ufw modules.
+# community.general.ufw module used in network-internal mode.
 #
 # Install before running:
 #   ansible-galaxy collection install community.general

@@ -11,7 +11,7 @@ On a Debian/Ubuntu machine (or the Raspberry Pi before it goes air-gapped):
 ```bash
 # Install apt-offline or use apt-get --download-only
 sudo apt-get update
-sudo apt-get install --download-only gcompris-qt lightdm tslib x11-utils x11-xserver-utils
+sudo apt-get install --download-only gcompris-qt lightdm tslib x11-utils x11-xserver-utils ufw iptables libraspberrypi-bin
 
 # Copy all downloaded .deb files:
 cp /var/cache/apt/archives/*.deb /path/to/this-directory/

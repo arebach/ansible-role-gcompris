@@ -53,7 +53,7 @@ ansible-playbook -i inventory.yml playbooks/provision.yml
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
   -e gcompris_rpi_kiosk_network_mode=none \
-  -e gcompris_rpi_kiosk_mode=yes
+  -e gcompris_rpi_kiosk_mode=true
 ```
 
 **Internal-only with age filtering (classroom, ages 4–8):**
@@ -67,7 +67,7 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
 **Normal desktop with GCompris (not kiosk):**
 ```bash
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_rpi_kiosk_mode=no
+  -e gcompris_rpi_kiosk_mode=false
 ```
 
 **With touchscreen support:**
@@ -90,7 +90,7 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
 
 | Value | Behavior |
 |-------|----------|
-| `yes` (default) | Full lockdown, autologin, auto-start GCompris |
+| `true` (default) | Full lockdown, autologin, auto-start GCompris |
 | `no` | Normal desktop, GCompris as regular app |
 
 ### Age Filtering (`gcompris_rpi_kiosk_min_age_level`, `gcompris_rpi_kiosk_max_age_level`)
@@ -115,6 +115,16 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 | `gcompris_rpi_kiosk_force_hdmi` | `false` | Force HDMI output even if undetected |
 | `gcompris_rpi_kiosk_enable_touchscreen` | `false` | Enable tslib for capacitive touch |
 | `gcompris_rpi_kiosk_screen_timeout_minutes` | `15` | Screen blank timeout in minutes (0 = always on) |
+
+### System Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `gcompris_rpi_kiosk_user` | `"kiosk"` | Dedicated system user for the kiosk session |
+| `gcompris_rpi_kiosk_group` | `"kiosk"` | System group for the kiosk user |
+| `gcompris_rpi_kiosk_version` | `""` | Pin GCompris-Qt version (empty = latest) |
+| `gcompris_rpi_kiosk_autologin_timeout` | `0` | LightDM autologin delay in seconds (0 = immediate) |
+| `gcompris_rpi_kiosk_local_pkg_dir` | `/var/cache/gcompris_rpi_kiosk_pkg` | Offline package staging directory |
 
 ## Network Modes in Detail
 
@@ -145,7 +155,7 @@ ansible-role-gcompris/
 │   ├── tasks/network-full.yml    # Network mode: full
 │   ├── tasks/network-internal.yml # Network mode: internal
 │   ├── tasks/network-none.yml    # Network mode: none (air-gapped)
-│   ├── handlers/main.yml         # Service restarts (LightDM, logind, UFW)
+│   ├── handlers/main.yml         # Service restarts (LightDM, logind, DPMS)
 │   ├── templates/
 │   │   ├── 10-autologin.conf.j2       # LightDM autologin config
 │   │   ├── gcompris-kiosk-session.j2  # Kiosk wrapper script
@@ -155,6 +165,7 @@ ansible-role-gcompris/
 │   │   └── 10-kiosk.conf         # X11 server flags (DontVTSwitch, DontZap)
 │   ├── packages/                 # Offline .deb staging directory
 │   ├── meta/main.yml             # Galaxy metadata
+│   ├── meta/requirements.yml     # Collection dependencies (community.general)
 │   └── molecule/default/         # Molecule test suite (Docker-based)
 ├── .gitignore
 └── README.md
@@ -174,7 +185,7 @@ The GitHub Actions pipeline runs on every push/PR:
 - **Network restriction** is the second layer — prevents any network-based attacks
 - **Age filtering** is the third layer — ensures age-appropriate content
 - **Air-gap mode** is the fourth layer — complete physical network isolation
-- All three layers work together; none alone is sufficient for unattended deployment
+- All four layers work together; none alone is sufficient for unattended deployment
 - **Inventory passwords** — the example `inventory.yml` contains a placeholder password. For real deployments, use `ansible-vault` to encrypt secrets or configure SSH key-based authentication instead of `ansible_become_pass`
 
 ## License

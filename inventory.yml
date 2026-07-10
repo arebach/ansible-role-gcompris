@@ -19,6 +19,6 @@ all:
           ansible_user: pi
           ansible_become_pass: your_password
           gcompris_rpi_kiosk_network_mode: internal
-          gcompris_rpi_kiosk_mode: yes
+          gcompris_rpi_kiosk_mode: true
           gcompris_rpi_kiosk_min_age_level: 0
           gcompris_rpi_kiosk_max_age_level: 5

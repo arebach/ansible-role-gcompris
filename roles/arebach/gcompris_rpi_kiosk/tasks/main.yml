@@ -3,7 +3,7 @@
 # Declarative, idempotent provisioning tasks for the GCompris kiosk
 # on Raspberry Pi.
 #
-# Kiosk mode (gcompris_rpi_kiosk_mode: yes) enables security lockdown:
+# Kiosk mode (gcompris_rpi_kiosk_mode: true) enables security lockdown:
 #   - X11 server flags block VT switching and server termination
 #   - Getty service on tty1 is masked
 #   - logind configured to disable virtual terminals

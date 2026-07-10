@@ -17,8 +17,8 @@
 #   "none"      — Air-gapped, no network at all
 #
 # Kiosk mode:
-#   yes (default) — Full lockdown, auto-start GCompris
-#   no            — Normal desktop, GCompris as regular app
+#   true (default) — Full lockdown, auto-start GCompris
+#   false          — Normal desktop, GCompris as regular app
 
 ---
 - name: Provision Raspberry Pi with GCompris Kiosk
