@@ -11,7 +11,7 @@ On a Debian/Ubuntu machine (or the Raspberry Pi before it goes air-gapped):
 ```bash
 # Install apt-offline or use apt-get --download-only
 sudo apt-get update
-sudo apt-get install --download-only gcompris lightdm tslib xscreensaver x11-utils x11-xserver-utils
+sudo apt-get install --download-only gcompris-qt lightdm tslib x11-utils x11-xserver-utils
 
 # Copy all downloaded .deb files:
 cp /var/cache/apt/archives/*.deb /path/to/this-directory/
@@ -21,11 +21,10 @@ cp /var/cache/apt/archives/*.deb /path/to/this-directory/
 
 At minimum, include these packages:
 
-- `gcompris` — the educational software
+- `gcompris-qt` — the educational software (Qt version)
 - `lightdm` — display manager for autologin
 - `tslib` — touchscreen calibration support
-- `xscreensaver` — screen blanking control
-- `x11-utils` + `x11-xserver-utils` — X11 tools
+- `x11-utils` + `x11-xserver-utils` — X11 tools (includes xset for DPMS control)
 - `ufw` + `iptables` — firewall (for internal/none network modes)
 - `libraspberrypi-bin` — HDMI configuration (provides `tvservice` utility)
 

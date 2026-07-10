@@ -136,7 +136,8 @@ ansible-role-gcompris/
 ├── playbooks/provision.yml       # Example deployment playbook
 ├── inventory.yml                 # Example host inventory
 ├── vars/deployment.yml           # Override examples
-├── gcompris-configuration.md    # GCompris CLI flag reference (in docs/)
+├── docs/
+│   └── gcompris-configuration.md # GCompris CLI flag reference
 ├── roles/arebach/gcompris_rpi_kiosk/
 │   ├── defaults/main.yml         # Overridable defaults (documented above)
 │   ├── vars/main.yml             # Internal variables, package lists

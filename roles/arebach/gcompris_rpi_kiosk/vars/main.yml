@@ -7,8 +7,8 @@
 # Core packages required for kiosk operation and GCompris runtime.
 #
 gcompris_packages:
-  # GCompris main package
-  - gcompris
+  # GCompris main package (Qt version)
+  - gcompris-qt
   # Fullscreen and kiosk support
   - x11-utils
   - x11-xserver-utils
@@ -16,8 +16,6 @@ gcompris_packages:
   - lightdm
   # Input / touchscreen support
   - tslib
-  # Screen blanking prevention
-  - xscreensaver
   # HDMI override utilities (tvservice is part of libraspberrypi-bin)
   - libraspberrypi-bin
   # Network filtering (for "internal" mode)

@@ -29,3 +29,6 @@ galaxy_info:
     - lightdm
     - touchscreen
     - age-restricted
+
+dependencies:
+  - community.general

@@ -52,13 +52,15 @@ gcompris_autologin_timeout: 0
 
 # ── Age Restriction ────────────────────────────────────────────────
 # Minimum age level (0-9) for activity filtering inside GCompris.
-# Maps to GCompris difficulty 1-6 (level+1).
+# Maps to GCompris difficulty 1-6 (level+1, clamped to 1-6 max).
+# Levels 0-5 map directly to difficulties 1-6; levels 6-9 are clamped to 6.
 gcompris_min_age_level: 0
 
 # ── Maximum Age Level ──────────────────────────────────────────────
 # Maximum age level (0-9) for activity filtering.
 # Set below 9 to lock out advanced activities.
-# Default 9 = all activities unlocked.
+# Default 9 = all activities unlocked (no --difficulty flag passed).
+# Levels 6-9 are clamped to difficulty 6 (GCompris maximum).
 gcompris_max_age_level: 9
 
 # ── Screen Timeout / Saver ────────────────────────────────────────

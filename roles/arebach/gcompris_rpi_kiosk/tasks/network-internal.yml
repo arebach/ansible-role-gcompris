@@ -20,7 +20,7 @@
     update_cache: true
 
 - name: Set UFW default policies (deny incoming, deny outgoing)
-  ansible.builtin.ufw:
+  community.general.ufw:
     direction: "{{ item.direction }}"
     policy: "{{ item.policy }}"
   loop:
@@ -28,7 +28,7 @@
     - { direction: "outgoing", policy: "deny" }
 
 - name: Allow outbound DNS to internal servers
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "out"
     to_addr: "{{ item.net }}"
@@ -40,7 +40,7 @@
     - { net: "192.168.0.0/16" }
 
 - name: Allow outbound DHCP to internal servers
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "out"
     to_addr: "{{ item.net }}"
@@ -52,7 +52,7 @@
     - { net: "192.168.0.0/16" }
 
 - name: Allow outbound SSH to internal servers
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "out"
     to_addr: "{{ item.net }}"
@@ -64,7 +64,7 @@
     - { net: "192.168.0.0/16" }
 
 - name: Allow outbound HTTP/HTTPS to internal servers
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "out"
     to_addr: "{{ item.net }}"
@@ -79,7 +79,7 @@
     - { net: "192.168.0.0/16", port: "443" }
 
 - name: Allow outbound RDP to internal servers
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "out"
     to_addr: "{{ item.net }}"
@@ -91,7 +91,7 @@
     - { net: "192.168.0.0/16" }
 
 - name: Allow inbound from internal ranges (SSH for admin)
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: "allow"
     direction: "in"
     from_addr: "{{ item.net }}"

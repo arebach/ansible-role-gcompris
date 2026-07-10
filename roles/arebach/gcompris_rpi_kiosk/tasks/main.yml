@@ -34,7 +34,6 @@
     - "/etc/systemd/logind.conf.d"
     - "/usr/share/xsessions"
     - "/usr/local/bin"
-    - "/etc/ufw/applications.d"
 
 # ── Task 2: Force X11 Display Compositor ─────────────────────────
 - name: Force Raspberry Pi OS display compositor to X11 mode
@@ -70,7 +69,7 @@
 # ── Task 6: Install GCompris Package ─────────────────────────────
 - name: Install GCompris from Debian repository
   ansible.builtin.apt:
-    name: "{{ gcompris_version | default('gcompris', true) }}"
+    name: "{{ gcompris_version | default('gcompris-qt', true) }}"
     state: "present"
     update_cache: true
     cache_valid_time: 3600

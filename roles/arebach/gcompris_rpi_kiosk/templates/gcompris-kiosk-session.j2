@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # GCompris RPi Kiosk — GCompris Kiosk Session Wrapper
 # =====================================================
-# This script launches GCompris in kiosk mode with the correct flags,
+# This script launches GCompris-Qt in kiosk mode with the correct flags,
 # age filtering, and security lockdown configured by the Ansible role.
 #
 # Deployed to: /usr/local/bin/gcompris-kiosk-session.sh
 #
-# GCompris Qt CLI flags used (per gcompris-configuration.md):
+# GCompris Qt CLI flags used (per docs/gcompris-configuration.md):
 #   --fullscreen          Force fullscreen, no window decorations
 #   --enable-kioskmode    Hide Quit and Configuration buttons
 #   --difficulty min-max Restrict activities to difficulty range (1-6)
@@ -20,11 +20,15 @@
 set -euo pipefail
 
 # ── Build command line ──────────────────────────────────────────
-CMD="gcompris --fullscreen --enable-kioskmode"
+CMD="gcompris-qt --fullscreen --enable-kioskmode"
 
-# Difficulty filtering (GCompris uses 1-6 scale, not 0-9)
+# Difficulty filtering (GCompris uses 1-6 scale; age_level 0-5 maps to 1-6)
+# Values above 5 are clamped to 6 (GCompris maximum difficulty).
+{% set min_diff = [1, gcompris_min_age_level | int + 1] | max %}
+{% set max_diff = [6, gcompris_max_age_level | int + 1] | min %}
+{% set min_diff = [min_diff, max_diff] | min %}
 {% if gcompris_min_age_level | int > 0 or gcompris_max_age_level | int < 9 %}
-CMD="${CMD} --difficulty {{ gcompris_min_age_level | int + 1 }}-{{ gcompris_max_age_level | int + 1 }}"
+CMD="${CMD} --difficulty {{ min_diff }}-{{ max_diff }}"
 {% endif %}
 
 # Touchscreen: disable cursor

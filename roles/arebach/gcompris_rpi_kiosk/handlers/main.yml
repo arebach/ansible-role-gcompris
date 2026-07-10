@@ -23,13 +23,6 @@
     name: "systemd-logind"
     state: "restarted"
 
-# ── Firewall ──────────────────────────────────────────────────────
-# Reloads iptables / UFW when network restriction rules change.
-- name: Reload UFW Firewall
-  ansible.builtin.systemd:
-    name: "ufw"
-    state: "restarted"
-
 # ── Screen Blanking ───────────────────────────────────────────────
 # Applies DPMS / screen blanking settings immediately based on the
 # configured timeout value. Requires an active X display.
