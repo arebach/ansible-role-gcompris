@@ -106,7 +106,8 @@
 
 - name: Enable UFW
   ansible.builtin.shell: |
-    timeout 30 ufw --force enable
+    set -o pipefail
+    echo "y" | timeout 60 ufw --force enable 2>&1 || true
   changed_when: true
   failed_when: false
 
