@@ -92,10 +92,14 @@ ansible-playbook -i inventory.yml playbooks/provision.yml \
 
 **Allow Ctrl+Alt+Backspace as maintenance exit:**
 ```bash
+# Default behavior — Ctrl+Alt+Backspace exits to greeter
+ansible-playbook -i inventory.yml playbooks/provision.yml
+
+# Lock down completely — block Ctrl+Alt+Backspace
 ansible-playbook -i inventory.yml playbooks/provision.yml \
-  -e gcompris_rpi_kiosk_block_zap=false
+  -e gcompris_rpi_kiosk_block_zap=true
 ```
-When zap is unblocked, pressing `Ctrl+Alt+Backspace` kills the X server and returns to the LightDM greeter for maintenance login. GCompris auto-restarts on next login.
+By default, pressing `Ctrl+Alt+Backspace` kills the X server and returns to the LightDM greeter for maintenance login. GCompris auto-restarts on next login. Set `block_zap=true` for unattended deployments.
 
 ### Diagnostics
 
@@ -157,7 +161,7 @@ Set both to the same value for a tight range (e.g., `min: 2 max: 2` for ages 3�
 - **`gcompris_rpi_kiosk_force_hdmi`** — `false` — Force HDMI output even if undetected
 - **`gcompris_rpi_kiosk_enable_touchscreen`** — `false` — Enable tslib for capacitive touch
 - **`gcompris_rpi_kiosk_screen_timeout_minutes`** — `15` — Screen blank timeout in minutes (0 = always on)
-- **`gcompris_rpi_kiosk_block_zap`** — `true` — Block `Ctrl+Alt+Backspace` (X server kill). Set to `false` to allow it as a maintenance exit shortcut — kills GCompris and returns to the LightDM greeter
+- **`gcompris_rpi_kiosk_block_zap`** — `false` — Block `Ctrl+Alt+Backspace` (X server kill). Set to `true` for full lockdown. When `false` (default), `Ctrl+Alt+Backspace` kills GCompris and returns to the LightDM greeter for maintenance
 
 ### System Configuration
 
