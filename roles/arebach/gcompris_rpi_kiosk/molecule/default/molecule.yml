@@ -12,7 +12,7 @@ driver:
 
 platforms:
   - name: rpi-os-bookworm-test
-    image: pycontribs/debian:12
+    image: geerlingguy/debian12
     privileged: true
     command: "/lib/systemd/systemd"
     volumes:
