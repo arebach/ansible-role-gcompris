@@ -1,7 +1,9 @@
 # GCompris RPi Kiosk — Molecule Test Configuration
 # ==================================================
-# Tests the role inside a privileged Docker container running Debian 12
-# (Bookworm) to simulate the target Raspberry Pi OS environment.
+# Tests the role inside a Docker container running Debian 12
+# (Bookworm) to verify configuration file generation.
+# Uses a plain Debian image (no systemd) since verify checks
+# are static file existence/content assertions only.
 
 ---
 dependency:
@@ -12,21 +14,17 @@ driver:
 
 platforms:
   - name: rpi-os-bookworm-test
-    image: geerlingguy/docker-debian12-ansible
+    image: debian:bookworm
     privileged: true
-    command: "/lib/systemd/systemd"
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    command: "sleep infinity"
     tmpfs:
       - "/run"
-      - "/run/lock"
       - "/tmp"
-    capabilities:
-      - "SYS_ADMIN"
 
 provisioner:
   name: ansible
   env:
     ANSIBLE_REMOTE_TMP: /tmp
+    ANSIBLE_PYTHON_INTERPRETER: /usr/bin/python3
   playbooks:
     verify: ../default/verify.yml
