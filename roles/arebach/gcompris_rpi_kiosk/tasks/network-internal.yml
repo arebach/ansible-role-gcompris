@@ -126,7 +126,8 @@
   retries: 3
   delay: 5
   until: >-
-    ansible_facts.services | dict2items
+    (ansible_facts.services | default({}))
+    | dict2items
     | selectattr('key', 'match', '^ufw')
     | selectattr('value.state', 'equalto', 'running')
     | list | length > 0
