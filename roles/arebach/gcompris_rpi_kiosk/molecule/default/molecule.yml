@@ -7,12 +7,10 @@
 dependency:
   name: shell
   options:
-    ignore-errors: true
+    ignore_errors: true
 
 driver:
   name: docker
-  options:
-    privileged: true
 
 platforms:
   - name: rpi-os-bookworm-test
@@ -21,7 +19,7 @@ platforms:
     command: "/lib/systemd/systemd"
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    cgroupns: host
+    cgroupns_mode: host
     tmpfs:
       - "/run"
       - "/run/lock"
@@ -35,5 +33,3 @@ provisioner:
 
 verifier:
   name: ansible
-  options:
-    verbose: true
