@@ -7,10 +7,12 @@
 - name: Verify GCompris RPi Kiosk role configuration
   hosts: all
   become: true
-  vars_files:
-    - ../../defaults/main.yml
   vars:
+    # Hardcode values from defaults/main.yml (avoids vars_files precedence issues)
+    gcompris_rpi_kiosk_local_pkg_dir: "/var/cache/gcompris_rpi_kiosk_pkg"
+    gcompris_rpi_kiosk_user: "kiosk"
     gcompris_rpi_kiosk_mode: false  # must match converge.yml overrides
+    gcompris_rpi_kiosk_network_mode: "internal"
     gcompris_rpi_kiosk_user_groups: ""
   tasks:
     # ── Package staging directory ──────────────────────────────────
