@@ -1,9 +1,5 @@
 # GCompris RPi Kiosk — Molecule Test Configuration
 # ==================================================
-# Tests the role inside a Docker container running Debian 12
-# (Bookworm) to verify configuration file generation.
-# Uses a plain Debian image (no systemd) since verify checks
-# are static file existence/content assertions only.
 
 ---
 driver:
@@ -23,9 +19,6 @@ provisioner:
   env:
     ANSIBLE_REMOTE_TMP: /tmp
     ANSIBLE_PYTHON_INTERPRETER: /usr/bin/python3
-
-verifier:
-  name: ansible
   playbooks:
     verify: verify.yml
 
@@ -36,4 +29,5 @@ scenario:
     - converge
     - idempotence
     - verify
+    - cleanup
     - destroy

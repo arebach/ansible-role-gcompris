@@ -1,0 +1,9 @@
+---
+# Cleanup playbook — no-op between test steps
+- name: Molecule cleanup (no-op)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: No cleanup actions needed
+      ansible.builtin.debug:
+        msg: "Cleanup skipped"
