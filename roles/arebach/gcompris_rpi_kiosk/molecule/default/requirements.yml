@@ -3,4 +3,3 @@
 # community.general is needed for the ufw module in network-internal.yml
 collections:
   - name: community.general
-    version: latest
