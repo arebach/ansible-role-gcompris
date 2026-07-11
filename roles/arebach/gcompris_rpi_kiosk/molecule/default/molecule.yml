@@ -28,3 +28,16 @@ provisioner:
     ANSIBLE_PYTHON_INTERPRETER: /usr/bin/python3
   playbooks:
     verify: ../default/verify.yml
+
+verifier:
+  name: ansible
+
+scenario:
+  test_sequence:
+    - dependency
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
