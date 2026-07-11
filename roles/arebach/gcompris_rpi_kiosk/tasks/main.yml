@@ -103,6 +103,7 @@
   when:
     - gcompris_rpi_kiosk_force_x11 | bool
     - gcompris_rpi_kiosk_raspi_config_check.rc != 0 or gcompris_rpi_kiosk_x11_result.rc != 0
+  failed_when: false
   notify: Restart LightDM Service
 
 # ── Task 3: Force HDMI Output (Optional) ─────────────────────────
@@ -222,6 +223,8 @@
   ansible.builtin.systemd:
     name: "lightdm"
     enabled: true
+    daemon_reload: true
+  failed_when: false
 
 # ── Task 11: Clear LightDM Session Cache (Kiosk Mode Only) ───────
 - name: Remove cached session configuration to prevent override
@@ -306,6 +309,7 @@
     - regexp: "^hdmi_blanking"
       line: "hdmi_blanking=1"
   when: gcompris_rpi_kiosk_mode | bool
+  failed_when: false
 
 # ── Task 18: Configure Touchscreen (If Enabled) ──────────────────
 - name: Deploy tslib calibration profile

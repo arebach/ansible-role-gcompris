@@ -82,8 +82,12 @@ jobs:
         run: |
           pip install molecule-plugins[docker]
 
+      - name: Install community.general collection
+        run: |
+          ansible-galaxy collection install community.general
+
       - name: Run Molecule test
-        working-directory: gcompris-role/roles/arebach/gcompris_rpi_kiosk/molecule/default
+        working-directory: gcompris-role/roles/arebach/gcompris_rpi_kiosk
         run: |
           molecule test --destroy=always
         env:

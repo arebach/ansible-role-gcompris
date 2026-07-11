@@ -11,5 +11,7 @@
   vars:
     gcompris_rpi_kiosk_network_mode: "internal"
     gcompris_rpi_kiosk_reboot: false  # never reboot inside Docker containers
+    gcompris_rpi_kiosk_update_system: false  # skip apt dist-upgrade in CI
+    gcompris_rpi_kiosk_force_x11: false  # no raspi-config or /boot/firmware in Docker
   roles:
     - role: "{{ playbook_dir }}/../.."  # noqa: role-name[path]
