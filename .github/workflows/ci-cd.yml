@@ -89,7 +89,7 @@ jobs:
       - name: Run Molecule test
         working-directory: gcompris-role/roles/arebach/gcompris_rpi_kiosk
         run: |
-          molecule test --destroy=always
+          molecule test
         env:
           DOCKER_HOST: "unix:///var/run/docker.sock"
 
