@@ -12,7 +12,7 @@ driver:
 
 platforms:
   - name: rpi-os-bookworm-test
-    image: geerlingguy/debian12
+    image: geerlingguy/docker-debian12-ansible
     privileged: true
     command: "/lib/systemd/systemd"
     volumes:
