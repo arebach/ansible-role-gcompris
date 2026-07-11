@@ -8,6 +8,7 @@
   ansible.builtin.systemd:
     name: "lightdm"
     state: "restarted"
+  failed_when: false
 
 # ── Input System ──────────────────────────────────────────────────
 # Restarts udev to pick up tslib / touchscreen calibrations.
@@ -15,6 +16,7 @@
   ansible.builtin.systemd:
     name: "udev"
     state: "restarted"
+  failed_when: false
 
 # ── Display Server ────────────────────────────────────────────────
 # Restarts systemd-logind to pick up VT disable changes.
@@ -22,6 +24,7 @@
   ansible.builtin.systemd:
     name: "systemd-logind"
     state: "restarted"
+  failed_when: false
 
 # ── Screen Blanking ───────────────────────────────────────────────
 # Applies DPMS / screen blanking settings immediately based on the
