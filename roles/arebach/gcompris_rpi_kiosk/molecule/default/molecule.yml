@@ -20,10 +20,13 @@ platforms:
     tmpfs:
       - "/run"
       - "/run/lock"
+      - "/tmp"
     capabilities:
       - "SYS_ADMIN"
 
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_REMOTE_TMP: /tmp
   playbooks:
     verify: ../default/verify.yml
