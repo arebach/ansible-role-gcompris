@@ -281,6 +281,7 @@
     enabled: false
     masked: true
   when: gcompris_rpi_kiosk_mode | bool
+  failed_when: false
 
 # ── Task 16: Configure Screen Timeout (Kiosk Mode Only) ───────────
 - name: Configure screen blank timeout via Xorg DPMS and screensaver flags
