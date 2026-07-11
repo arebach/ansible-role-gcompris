@@ -76,7 +76,7 @@ jobs:
       - name: Install Ansible and Molecule
         run: |
           python -m pip install --upgrade pip
-          pip install ansible molecule molecule-plugins[docker] ansible-lint
+          pip install ansible molecule molecule-plugins[docker] ansible-lint passlib
 
       - name: Install Molecule Docker driver
         run: |
