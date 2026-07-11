@@ -23,11 +23,11 @@ provisioner:
   env:
     ANSIBLE_REMOTE_TMP: /tmp
     ANSIBLE_PYTHON_INTERPRETER: /usr/bin/python3
-  playbooks:
-    verify: verify.yml
 
 verifier:
   name: ansible
+  playbooks:
+    verify: verify.yml
 
 scenario:
   test_sequence:
