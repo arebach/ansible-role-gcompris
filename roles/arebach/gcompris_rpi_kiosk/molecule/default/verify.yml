@@ -9,6 +9,9 @@
   become: true
   vars_files:
     - ../../defaults/main.yml
+  vars:
+    gcompris_rpi_kiosk_mode: false  # must match converge.yml overrides
+    gcompris_rpi_kiosk_user_groups: ""
   tasks:
     # ── Package staging directory ──────────────────────────────────
     - name: Check package staging directory exists
