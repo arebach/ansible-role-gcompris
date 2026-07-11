@@ -118,11 +118,13 @@
     enabled: true
     no_block: true
   register: gcompris_rpi_kiosk_ufw_restart
+  changed_when: false
   failed_when: false
 
 - name: Wait for UFW to become active (3 retries, 5s delay)
   ansible.builtin.service_facts:
   register: gcompris_rpi_kiosk_ufw_facts
+  changed_when: false
   retries: 3
   delay: 5
   until: >-
