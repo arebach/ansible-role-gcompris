@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+- **Fix: UFW enable hang** — replaced hanging `ufw --force enable` shell command with `lineinfile` to write `ENABLED=yes` to `/etc/ufw/ufw.conf` + `systemd` module with `no_block: true` to issue the restart without blocking. A `service_facts` verification task polls for UFW active state with 3 retries (5s delay between attempts). If all 3 attempts fail, the play continues (fail-forward) with a visible debug warning — rules still apply on next reboot since the config file is the source of truth.
+
 ## 1.3.0
 
 - **Feature: OS update and upgrade** — new `gcompris_rpi_kiosk_update_system` variable (default: `true`) runs `apt-get update` and `apt-get dist-upgrade` as the very first action before any kiosk provisioning. Ensures the host OS is fully patched. Disable with `-e gcompris_rpi_kiosk_update_system=false` for offline reprovisioning.

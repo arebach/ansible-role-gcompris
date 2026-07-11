@@ -104,19 +104,47 @@
     - { net: "172.16.0.0/12" }
     - { net: "192.168.0.0/16" }
 
-- name: Enable UFW via config file (avoids ufw enable hang)
+- name: Enable UFW via config file
   ansible.builtin.lineinfile:
     path: "/etc/ufw/ufw.conf"
     regexp: "^ENABLED="
     line: "ENABLED=yes"
     create: false
 
-- name: Restart UFW service to apply rules
+- name: Restart UFW service (non-blocking to avoid hang)
   ansible.builtin.systemd:
     name: "ufw"
     state: "restarted"
     enabled: true
+    no_block: true
+  register: gcompris_rpi_kiosk_ufw_restart
   failed_when: false
+
+- name: Wait for UFW to become active (3 retries, 5s delay)
+  ansible.builtin.service_facts:
+  register: gcompris_rpi_kiosk_ufw_facts
+  retries: 3
+  delay: 5
+  until: >-
+    ansible_facts.services | dict2items
+    | selectattr('key', 'match', '^ufw')
+    | selectattr('value.state', 'equalto', 'running')
+    | list | length > 0
+  failed_when: false
+
+- name: Warn if UFW did not activate (fail-forward)
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: UFW did not activate after 3 attempts.
+      Firewall rules are written to /etc/ufw/ufw.conf and will apply
+      on next reboot. Kiosk continuing without active firewall —
+      manual intervention recommended.
+  when: >-
+    gcompris_rpi_kiosk_ufw_facts is failed or
+    gcompris_rpi_kiosk_ufw_facts.services | default({})
+    | dict2items | selectattr('key', 'match', '^ufw')
+    | selectattr('value.state', 'equalto', 'running')
+    | list | length == 0
 
 - name: Disable Bluetooth (reduce wireless attack surface)
   ansible.builtin.systemd:
