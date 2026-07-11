@@ -125,7 +125,7 @@
   ansible.builtin.user:
     name: "{{ gcompris_rpi_kiosk_user }}"
     group: "{{ gcompris_rpi_kiosk_group }}"
-    groups: "video,input,tty,audio,plugdev"
+    groups: "{{ gcompris_rpi_kiosk_user_groups }}"
     append: true
     shell: "/bin/bash"
     create_home: true

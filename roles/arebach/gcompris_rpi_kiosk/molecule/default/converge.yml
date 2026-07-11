@@ -13,5 +13,6 @@
     gcompris_rpi_kiosk_reboot: false  # never reboot inside Docker containers
     gcompris_rpi_kiosk_update_system: false  # skip apt dist-upgrade in CI
     gcompris_rpi_kiosk_force_x11: false  # no raspi-config or /boot/firmware in Docker
+    gcompris_rpi_kiosk_user_groups: ""  # RPi hardware groups don't exist in Docker
   roles:
     - role: "{{ playbook_dir }}/../.."  # noqa: role-name[path]

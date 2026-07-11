@@ -37,6 +37,12 @@ gcompris_rpi_kiosk_mode: true
 #
 gcompris_rpi_kiosk_network_mode: "internal"
 
+# ── Kiosk User Supplementary Groups ──────────────────────────────
+# Groups the kiosk user belongs to for hardware access.
+# Override to [] for environments where these groups don't exist
+# (e.g., Docker containers in CI).
+gcompris_rpi_kiosk_user_groups: "video,input,tty,audio,plugdev"
+
 # ── Kiosk User ─────────────────────────────────────────────────────
 # Dedicated system user for the kiosk session
 gcompris_rpi_kiosk_user: "kiosk"
