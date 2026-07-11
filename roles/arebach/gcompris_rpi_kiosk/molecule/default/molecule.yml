@@ -5,9 +5,7 @@
 
 ---
 dependency:
-  name: shell
-  options:
-    ignore_errors: true
+  name: galaxy
 
 driver:
   name: docker
@@ -19,7 +17,6 @@ platforms:
     command: "/lib/systemd/systemd"
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    cgroupns_mode: host
     tmpfs:
       - "/run"
       - "/run/lock"
@@ -30,6 +27,3 @@ provisioner:
   name: ansible
   playbooks:
     verify: ../default/verify.yml
-
-verifier:
-  name: ansible
