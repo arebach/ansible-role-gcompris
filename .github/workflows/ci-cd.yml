@@ -25,6 +25,7 @@ on:
       - "roles/arebach/gcompris_rpi_kiosk/**"
       - ".github/workflows/**"
       - "galaxy.yml"
+  workflow_dispatch:
 
 env:
   ANSIBLE_FORCE_COLOR: "true"
