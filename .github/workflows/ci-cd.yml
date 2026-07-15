@@ -114,8 +114,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
 
+      - name: Build collection
+        run: |
+          ansible-galaxy collection build --force
+
       - name: Publish to Ansible Galaxy
         env:
           GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
         run: |
-          ansible-galaxy role import --api-key "$GALAXY_API_KEY" arebach ansible-role-gcompris --role-name gcompris_rpi_kiosk
+          ansible-galaxy collection publish arebach-gcompris_rpi_kiosk-*.tar.gz --token "$GALAXY_API_KEY"
