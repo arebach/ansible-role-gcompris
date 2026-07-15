@@ -122,4 +122,7 @@ jobs:
         env:
           GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
         run: |
-          ansible-galaxy collection publish arebach-gcompris_rpi_kiosk-*.tar.gz --token "$GALAXY_API_KEY"
+          ansible-galaxy collection publish arebach-gcompris_rpi_kiosk-*.tar.gz \
+            --server https://galaxy.ansible.com \
+            --token "$GALAXY_API_KEY" \
+            --verbose
